@@ -18,12 +18,13 @@ public enum CardNumberEnum {
     EIGHT(8),
     NINE(9),
     TEN(10),
-    J(11),
-    Q(12),
-    K(13),
 
-    SMALL_JOKER(14),
-    BIG_JOKER(15);
+    JACK(11),         // J
+    LADY(12),         // Q
+    KING(13),         // K
+
+    SMALL_JOKER(14),  // 小王
+    BIG_JOKER(15);    // 大王
 
     private int value;
 

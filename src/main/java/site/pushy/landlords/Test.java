@@ -1,7 +1,7 @@
 package site.pushy.landlords;
 
 import site.pushy.landlords.common.enums.CardGradeEnum;
-import site.pushy.landlords.common.enums.CardNumberEnum;
+import site.pushy.landlords.core.Main;
 import site.pushy.landlords.pojo.Card;
 
 import java.util.Arrays;

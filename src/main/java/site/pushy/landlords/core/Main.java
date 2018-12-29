@@ -1,4 +1,4 @@
-package site.pushy.landlords;
+package site.pushy.landlords.core;
 
 import site.pushy.landlords.common.enums.CardNumberEnum;
 import site.pushy.landlords.pojo.Card;
@@ -161,9 +161,9 @@ public class Main {
     }
 
     /**
-     * 判断是否出的牌是飞机带其他牌
+     * 判断是否出的牌是飞机带翅膀
      */
-    public static boolean isFly(List<Card> cards) {
+    public static boolean isAircraftWithWing(List<Card> cards) {
         if (isEmpty(cards) || cards.size() < 6) {
             return false;
         }
@@ -174,9 +174,9 @@ public class Main {
     }
 
     /**
-     * 判断是否出的牌是飞机不带牌
+     * 判断是否出的牌是飞机
      */
-    public static boolean isFlyWithNone(List<Card> cards) {
+    public static boolean isAircraft(List<Card> cards) {
         if (isEmpty(cards) || cards.size() % 3 != 0) {
             return false;
         }
