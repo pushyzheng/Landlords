@@ -1,6 +1,7 @@
 package site.pushy.landlords.pojo;
 
 import lombok.Data;
+import site.pushy.landlords.common.enums.CardGradeEnum;
 import site.pushy.landlords.common.enums.CardNumberEnum;
 import site.pushy.landlords.common.enums.CardTypeEnum;
 
@@ -22,15 +23,46 @@ public class Card implements Comparable<Card> {
     // 牌的数值
     private CardNumberEnum number;
 
-    // 牌的等级
-    private int grade;
+    // 牌的等级，和数值差别在于，A和2数值虽然比3~K小，但是等级却比3高
+    private CardGradeEnum grade;
+
+    public int getNumberValue() {
+        if (number != null) {
+            return number.getValue();
+        }
+        return -1;
+    }
+
+    public int getGradeValue() {
+        if (grade != null) {
+            return grade.getValue();
+        }
+        return -1;
+    }
+
+    public String getTypeName() {
+        if (type != null) {
+            return type.getName();
+        }
+        return null;
+    }
 
     /**
      * 实现牌比大小的方法，可提供给卡牌数组排序使用
      * @param o 另一张对比的牌
      */
+    @Override
     public int compareTo(Card o) {
-        return Integer.compare(this.getNumber().getValue(), o.number.getValue());
+//        return Integer.compare(this.getNumberValue(), o.getNumberValue());
+        return Integer.compare(this.getGradeValue(), o.getGradeValue());
+    }
+
+    /**
+     * 两张牌等级比较方法
+     * @param o 另一张对比的牌
+     */
+    public int compareGradeTo(Card o) {
+        return Integer.compare(this.getGradeValue(), o.getGradeValue());
     }
 
     /**
@@ -42,7 +74,11 @@ public class Card implements Comparable<Card> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         //if (!super.equals(o)) return false;
+
         Card other = (Card) o;
+        if (number == null || other.number == null) {
+            return false;
+        }
         return number.getValue() == other.number.getValue();
     }
 

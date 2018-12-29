@@ -1,12 +1,14 @@
 package site.pushy.landlords.common.enums;
 
 /**
+ * 牌的数值枚举值
+ *
  * @author Pushy
  * @since 2018/12/28 21:23
  */
 public enum CardNumberEnum {
 
-    A(1),
+    ONE(1),
     TWO(2),
     THREE(3),
     FOUR(4),
