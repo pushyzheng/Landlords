@@ -46,25 +46,24 @@ public class CompareGrade {
         Card myCard = myCards.get(0);
         Card prevCard = prevCards.get(0);
 
+        /* 排除玩家出牌和出牌类型不一致的情况 */
         if (prevType != myType) {
             return false;
         }
-
-
         /* 3带1，只需要比较第二张牌的等级即可 */
-        if (prevType == TypeEnum.THREE_WITH_ONE && myType == TypeEnum.THREE_WITH_ONE) {
+        if (prevType == TypeEnum.THREE_WITH_ONE) {
             myCard = myCards.get(1);
             prevCard = prevCards.get(1);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
         /* 4带2，只需要比较第三张牌大小的等级 */
-        else if (prevType == TypeEnum.FOUR_WITH_TWO && myType == TypeEnum.FOUR_WITH_TWO) {
+        else if (prevType == TypeEnum.FOUR_WITH_TWO) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
         /* 顺子，只需要比较最大的一张牌的大小，但是顺子的个数必须相同 */
-        else if (prevType == TypeEnum.STRAIGHT && myType == TypeEnum.STRAIGHT) {
+        else if (prevType == TypeEnum.STRAIGHT) {
             if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
                 return false;
             }

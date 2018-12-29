@@ -17,7 +17,7 @@ public enum TypeEnum {
     STRAIGHT("顺子"),
     STRAIGHT_PAIR("连对"),
 
-    AIRCRAFT_WITH_WING("飞机带翅膀"),
+    AIRCRAFT_WITH_WINGS("飞机带翅膀"),
     AIRCRAFT("飞机"),
 
     FOUR_WITH_TWO("四带二");

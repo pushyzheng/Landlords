@@ -25,4 +25,8 @@ public class CardUtil {
         return compareGrade(card, other) == 1;
     }
 
+    public static boolean compareGradeTo(int grade, int other) {
+        return grade > other;
+    }
+
 }
