@@ -1,4 +1,4 @@
-package site.pushy.landlords.common.enums;
+package site.pushy.landlords.core.enums;
 
 /**
  * @author Pushy
@@ -10,6 +10,7 @@ public enum TypeEnum {
     PAIR("对子"),
     THREE("三张"),
     THREE_WITH_ONE("三带一"),
+    THREE_WITH_PAIR("三带一对"),
 
     BOMB("炸弹"),
     JOKER_BOMB("王炸"),

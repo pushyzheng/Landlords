@@ -20,5 +20,4 @@ public class Room {
 
     private List<WebSocketSession> userSessionList;  // 当家玩家客户端Session对象列表
 
-
 }

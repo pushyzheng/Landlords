@@ -1,7 +1,9 @@
 package site.pushy.landlords.core;
 
-import site.pushy.landlords.common.enums.CardGradeEnum;
-import site.pushy.landlords.common.enums.TypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import site.pushy.landlords.core.enums.CardGradeEnum;
+import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 
 import java.util.Collections;
@@ -12,6 +14,8 @@ import java.util.List;
  * @since 2018/12/29 15:09
  */
 public class CompareGrade {
+
+    private static Logger logger = LoggerFactory.getLogger(CompareGrade.class.getSimpleName());
 
     /**
      * 判断是否可以出牌，也就是当前玩家的牌是否比上家的大
@@ -62,7 +66,7 @@ public class CompareGrade {
             prevCard = prevCards.get(2);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
-        /* 顺子，只需要比较最大的一张牌的大小，但是顺子的个数必须相同 */
+        /* 顺子，只需要比较最大的一张牌的大小 */
         else if (prevType == TypeEnum.STRAIGHT) {
             if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
                 return false;
@@ -71,11 +75,54 @@ public class CompareGrade {
             prevCard = prevCards.get(prevSize - 1);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
-
+        /* 连对，和顺子一样，只需要比较最大的一张牌的大小 */
+        else if (prevType == TypeEnum.STRAIGHT_PAIR) {
+            if (mySize != prevSize) {
+                return false;
+            } else {
+                myCard = myCards.get(mySize - 1);
+                prevCard = prevCards.get(prevSize - 1);
+                return CardUtil.compareGradeTo(myCard, prevCard);
+            }
+        }
+        /* 飞机 */
+        else if (prevType == TypeEnum.AIRCRAFT) {
+            if (mySize == prevSize) {
+                return false;
+            } else {
+                // Todo 飞机判断存在问题
+                myCard = myCards.get(5);
+                prevCard = prevCards.get(5);
+                return CardUtil.compareGradeTo(myCard, prevCard);
+            }
+        }
         /* 单张、对子、三张、炸弹等情况，都是只需要判断第一章牌大小即可 */
         else {
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
+    }
+
+    /**
+     * 判断当前玩家手中是否有牌可以管住上家出的牌
+     * @param myCards 当前玩家手中所有的牌
+     * @param prevCards 上家出的牌
+     * @param prevType 上家出的牌的类型
+     */
+    public static boolean hasHighGradeCards(List<Card> myCards,
+                                            List<Card> prevCards, TypeEnum prevType) {
+        if (myCards == null || prevCards == null) {
+            return false;
+        }
+        if (prevType == null) {
+            logger.error("上家出的牌不合法，无法出牌");
+            return false;
+        }
+
+        // Todo 实现 => 判断当前玩家手中是否有牌可以管住上家出的牌
+
+        Collections.sort(myCards);
+        Collections.sort(prevCards);
+        return false;
     }
 
     public static void main(String[] args) {

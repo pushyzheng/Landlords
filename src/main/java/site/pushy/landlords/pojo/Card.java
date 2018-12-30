@@ -1,9 +1,9 @@
 package site.pushy.landlords.pojo;
 
 import lombok.Data;
-import site.pushy.landlords.common.enums.CardGradeEnum;
-import site.pushy.landlords.common.enums.CardNumberEnum;
-import site.pushy.landlords.common.enums.CardTypeEnum;
+import site.pushy.landlords.core.enums.CardGradeEnum;
+import site.pushy.landlords.core.enums.CardNumberEnum;
+import site.pushy.landlords.core.enums.CardTypeEnum;
 
 import java.util.Objects;
 
@@ -25,6 +25,12 @@ public class Card implements Comparable<Card> {
 
     // 牌的等级，和数值差别在于，A和2数值虽然比3~K小，但是等级却比3高
     private CardGradeEnum grade;
+
+    public Card() { }
+
+    public Card(int id) {
+        this.id = id;
+    }
 
     public int getNumberValue() {
         if (number != null) {
@@ -85,5 +91,15 @@ public class Card implements Comparable<Card> {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), number.getValue());
+    }
+
+    @Override
+    public String toString() {
+        /*return "Card{" +
+                "type=" + type.getName() +
+                ", number=" + number.getValue() +
+                ", grade=" + grade +
+                "}";*/
+        return "" + number.getValue();
     }
 }

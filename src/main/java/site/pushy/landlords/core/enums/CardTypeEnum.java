@@ -1,4 +1,4 @@
-package site.pushy.landlords.common.enums;
+package site.pushy.landlords.core.enums;
 
 /**
  * 牌的类型枚举值
