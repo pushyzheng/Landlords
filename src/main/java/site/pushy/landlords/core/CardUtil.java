@@ -40,27 +40,27 @@ public class CardUtil {
     public static TypeEnum getCardType(List<Card> cards) {
         TypeEnum type = null;
         if (cards != null && cards.size() != 0) {
-            if (TypeJudge.isSingle(cards)) {
+            if (JudgeType.isSingle(cards)) {
                 type = TypeEnum.SINGLE;
-            } else if (TypeJudge.isPair(cards)) {
+            } else if (JudgeType.isPair(cards)) {
                 type = TypeEnum.PAIR;
-            } else if (TypeJudge.isThree(cards)) {
+            } else if (JudgeType.isThree(cards)) {
                 type = TypeEnum.THREE;
-            } else if (TypeJudge.isThreeWithOne(cards)) {
+            } else if (JudgeType.isThreeWithOne(cards)) {
                 type = TypeEnum.THREE_WITH_ONE;
-            } else if (TypeJudge.isStraight(cards)) {
+            } else if (JudgeType.isStraight(cards)) {
                 type = TypeEnum.STRAIGHT;
-            } else if (TypeJudge.isStraightPair(cards)) {
+            } else if (JudgeType.isStraightPair(cards)) {
                 type = TypeEnum.STRAIGHT_PAIR;
-            } else if (TypeJudge.isFourWithTwo(cards)) {
+            } else if (JudgeType.isFourWithTwo(cards)) {
                 type = TypeEnum.FOUR_WITH_TWO;
-            } else if (TypeJudge.isBomb(cards)) {
+            } else if (JudgeType.isBomb(cards)) {
                 type = TypeEnum.BOMB;
-            } else if (TypeJudge.isJokerBomb(cards)) {
+            } else if (JudgeType.isJokerBomb(cards)) {
                 type = TypeEnum.JOKER_BOMB;
-            } else if (TypeJudge.isAircraft(cards)) {
+            } else if (JudgeType.isAircraft(cards)) {
                 type = TypeEnum.AIRCRAFT;
-            } else if (TypeJudge.isAircraftWithWing(cards)) {
+            } else if (JudgeType.isAircraftWithWing(cards)) {
                 type = TypeEnum.AIRCRAFT_WITH_WINGS;
             }
         }

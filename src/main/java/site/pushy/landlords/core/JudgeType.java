@@ -10,7 +10,7 @@ import java.util.List;
  * @author Pushy
  * @since 2018/12/28 21:51
  */
-public class TypeJudge {
+public class JudgeType {
 
     private static int JOKER_BOMB_NUMBER_SUM =
             CardNumberEnum.BIG_JOKER.getValue() + CardNumberEnum.SMALL_JOKER.getValue();

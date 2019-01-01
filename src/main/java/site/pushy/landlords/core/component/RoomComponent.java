@@ -1,8 +1,8 @@
-package site.pushy.landlords.common.component;
+package site.pushy.landlords.core.component;
 
 import org.springframework.stereotype.Component;
+import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Room;
-import site.pushy.landlords.pojo.User;
 
 import java.util.concurrent.ConcurrentHashMap;
 

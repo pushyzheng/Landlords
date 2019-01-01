@@ -1,7 +1,7 @@
 package site.pushy.landlords.service;
 
+import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Room;
-import site.pushy.landlords.pojo.User;
 
 /**
  * @author Pushy

@@ -1,11 +1,11 @@
 spring:
     datasource:
         name: test
-        url: jdbc:mysql://localhost:3306/pcomy_dev?useSSL=true
+        url: jdbc:mysql://localhost:3306/landlords?serverTimezone=GMT
         username: root
         password: 123456
         type: com.alibaba.druid.pool.DruidDataSource
-        driver-class-name: com.mysql.jdbc.Driver
+        driver-class-name: com.mysql.cj.jdbc.Driver
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: site.pushy.landlords.pojo.DO

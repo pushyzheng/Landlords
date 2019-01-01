@@ -16,7 +16,7 @@ public class Room {
 
     private String password;  // 房间密码
 
-    private List<User> userList;  // 当前玩家列表
+    private List<Player> playerList;  // 当前玩家列表
 
     private List<WebSocketSession> userSessionList;  // 当家玩家客户端Session对象列表
 
