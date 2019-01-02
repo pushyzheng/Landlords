@@ -11,7 +11,7 @@ import java.util.List;
  * @since 2019/1/1 17:23
  */
 @Data
-public class Player {
+public class Player implements Comparable<Player> {
 
     private Integer id;  // 玩家在当前房间的座位顺序
 
@@ -28,4 +28,8 @@ public class Player {
         return "";
     }
 
+    @Override
+    public int compareTo(Player other) {
+        return Integer.compare(id, other.id);
+    }
 }
