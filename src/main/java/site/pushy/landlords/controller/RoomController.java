@@ -21,20 +21,27 @@ public class RoomController {
     @Autowired
     private RoomComponent roomComponent;
 
-    //获取所有房间列表
+    /**
+     * 获取所有房间列表
+     * @return
+     */
     @GetMapping("")
     public String listRoom() {
         return RespEntity.success(roomComponent.getRooms());
     }
 
-    //创建房间
+    /**
+     * 创建房间
+     */
     @PostMapping("")
     public String createRoom(@SessionAttribute User user, @RequestBody ReqRoom reqRoom) {
         String roomPassword = reqRoom.getPassword();
         return RespEntity.success(roomComponent.createRoom(user, roomPassword));
     }
 
-    //加入房间
+    /**
+     * 加入房间
+     */
     @PostMapping("/join")
     public String joinRoom(@RequestBody ReqRoom reqRoom, @SessionAttribute User user) {
         String roomId = reqRoom.getId();
@@ -47,7 +54,9 @@ public class RoomController {
         return RespEntity.success(message);
     }
 
-    //退出房间
+    /**
+     * 退出房间
+     */
     @PostMapping("/exit")
     public String exitRoom(@RequestBody ReqRoom reqRoom, @SessionAttribute User user) {
         String roomId = reqRoom.getId();
@@ -55,7 +64,9 @@ public class RoomController {
         return RespEntity.success(message);
     }
 
-    //获取下家
+    /**
+     * 获取下家
+     */
     @GetMapping("/next")
     public String getNextPlayer(@RequestBody ReqRoom reqRoom, @SessionAttribute User user) {
         String roomid = reqRoom.getId();

@@ -5,7 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import site.pushy.landlords.common.handler.WebSocketPushHandler;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Fuxing
@@ -15,34 +19,31 @@ import site.pushy.landlords.pojo.Room;
 public class NotifyComponent {
 
     @Autowired
-    private WebSocketPushHandler websocketHandler;
+    private WebSocketPushHandler webSocketHandler;
 
     @Autowired
     private RoomComponent roomComponent;
 
-    /*
-        1. 发送给某个房间所有的客户端消息
-        2. 发送给某个玩家的客户端消息
+    /**
+     * 发送给某个房间所有的客户端消息
+     * @return 是否发送成功，一旦一个客户端发送不成功，则视为不成功
      */
-
-    //发送给某个房间所有的客户端消息
-    public void toAll(String id,TextMessage message){
-        for (Room room:roomComponent.getRooms()
-             ) {
-            if(room.getId().equals(id)){
-                //得到这个房间的所有用户
-                for (User user:room.getUserList()
-                     ) {
-                    String userId = user.getId();
-                    websocketHandler.sendMessageToUser(userId,message);
-                }
-            }
+    public boolean sendToAllUserOfRoom(String roomId, String content) {
+        Room room = roomComponent.getRoom(roomId);
+        List<String> userIdList = new LinkedList<>();
+        for (User user : room.getUserList()) {
+            userIdList.add(user.getId());
         }
+        return webSocketHandler.sendToUsers(userIdList, content);
     }
 
-    //发送给某个玩家的客户端消息
-    public void toOne(String userId, TextMessage message){
-        websocketHandler.sendMessageToUser(userId,message);
+    /**
+     * 发送给某个玩家的客户端消息
+     * @param userId
+     * @param content
+     */
+    public boolean sendToUser(String userId, String content) {
+        return webSocketHandler.sendToUser(userId, content);
     }
 
 
