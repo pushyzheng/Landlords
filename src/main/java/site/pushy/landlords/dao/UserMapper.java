@@ -1,11 +1,13 @@
 package site.pushy.landlords.dao;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DO.UserExample;
 
 import java.util.List;
 
+@Repository
 public interface UserMapper {
 
     long countByExample(UserExample example);
