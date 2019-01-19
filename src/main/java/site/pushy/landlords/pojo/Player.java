@@ -21,6 +21,8 @@ public class Player implements Comparable<Player> {
 
     private User user;  // 玩家的用户对象
 
+    private boolean ready;  // 玩家是否准备
+
     public String getIdentityName() {
         if (identity != null) {
             return identity.getName();

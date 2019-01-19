@@ -14,14 +14,14 @@ import site.pushy.landlords.common.interceptor.WebSocketInterceptor;
  * @since 2019/1/2 20:14
  */
 @Configuration
-@EnableWebSocket  // 开启websocket
+@EnableWebSocket  // 开启webSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        // 将WebSocketPushHandler映射到 /webSocketServer
-        registry.addHandler(WebSocketPushHandler(), "/webSocketServer")
-                .addInterceptors(new WebSocketInterceptor());
+        registry.addHandler(WebSocketPushHandler(), "/ws")
+                .addInterceptors(new WebSocketInterceptor())
+                .setAllowedOrigins("*");
     }
 
     @Bean

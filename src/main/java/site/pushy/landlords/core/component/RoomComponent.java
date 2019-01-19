@@ -178,6 +178,17 @@ public class RoomComponent {
         return rooms;
     }
 
+    public Room getRoom(String roomId) {
+        return roomMap.get(roomId);
+    }
+
+    public void updateRoom(Room newRoom) {
+        String id = newRoom.getId();
+        if (roomMap.get(id) == null) {
+            throw new NotFoundException("该房间不存在");
+        }
+        roomMap.put(id, newRoom);
+    }
 
     /**
      * 获得下个玩家
