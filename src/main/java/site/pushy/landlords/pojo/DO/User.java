@@ -3,6 +3,7 @@ package site.pushy.landlords.pojo.DO;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author Pushy
@@ -25,4 +26,15 @@ public class User {
 
     private Date timestamp;
 
+    public User() {
+        this.id = UUID.randomUUID().toString().replace("-", "");
+        this.timestamp = new Date();
+        this.money = 0.0;
+    }
+
+    public User(String username, String password) {
+        this();
+        this.username = username;
+        this.password = password;
+    }
 }

@@ -38,17 +38,10 @@ public class JWTUtil {
      * 解码, 通过Token解码出用户的userId
      * @param token
      */
-    public static int decode(String token) {
+    public static String decode(String token) {
         Jws<Claims> jws = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
         Claims claims = jws.getBody();
-        return (int) claims.get("userId");
-    }
-
-    public static void main(String[] args) {
-//        String token = JWTUtil.encode(1);
-        int id = JWTUtil.decode("2faklsdfjklasjdflkjaslkdf");
-
-        System.out.println(id);
+        return (String) claims.get("userId");
     }
 
 
