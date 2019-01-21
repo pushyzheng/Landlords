@@ -7,6 +7,8 @@ import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.service.GameService;
 
+import javax.validation.Valid;
+
 /**
  * @author Pushy
  * @since 2019/1/9 21:16
@@ -19,9 +21,9 @@ public class GameController {
     private GameService gameService;
 
     @PostMapping("/ready")
-    public String readyGame(@SessionAttribute User user,
-                            @RequestBody ReadyGameDTO readyGameDTO) {
-        boolean start = gameService.readyGame(user, readyGameDTO);
+    public String readyGame(@SessionAttribute User curUser,
+                            @Valid @RequestBody ReadyGameDTO readyGameDTO) {
+        boolean start = gameService.readyGame(curUser, readyGameDTO);
         if (start) {
             gameService.startGame(readyGameDTO.getRoomId());
         }

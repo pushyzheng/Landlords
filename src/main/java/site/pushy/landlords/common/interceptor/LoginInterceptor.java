@@ -7,12 +7,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import site.pushy.landlords.common.util.JWTUtil;
+import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.PrintWriter;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -24,6 +26,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
+        if (httpServletRequest.getMethod().equals("OPTIONS"))
+            return true;
+
         // 在拦截点执行前拦截，如果返回true则不执行拦截点后的操作（拦截成功）
         // 返回false则不执行拦截
         HttpSession session = httpServletRequest.getSession();
@@ -40,6 +45,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 session.setAttribute("curUser", user);
                 return true;
             } catch (Exception e) {
+                e.printStackTrace();
                 httpServletResponse.sendRedirect("/401");
                 return false;
             }

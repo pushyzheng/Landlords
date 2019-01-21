@@ -41,7 +41,7 @@ public class RoomComponent {
         room.setUserList(userList);
         room.setPlayerList(playerList);
         //是否设置密码
-        if (roomPassword != null) {
+        if (roomPassword != null && !roomPassword.isEmpty()) {
             //设置了
             room.setLocked(true);
             room.setPassword(roomPassword);
@@ -79,6 +79,8 @@ public class RoomComponent {
                 } else {
                     //房间人数小于三人可以加入
                     if (room.isLocked()) {
+                        if (roomPassword == null)
+                            throw new ForbiddenException("对不起,您输入的房间密码有误!");
                         //有密码
                         if (roomPassword.equals(room.getPassword())) {
                             //分配座位顺序
@@ -130,32 +132,27 @@ public class RoomComponent {
 
     /**
      * 退出房间
-     *
      * @param id
      * @param user
-     * @return
      */
     public String exitRoom(String id, User user) {
-        // if count == 0 => 解散
         Room room = roomMap.get(id);
-        if (room == null) {
-            throw new BadRequestException("退出失败,该房间已解散");
-        } else {
-            room.getUserList().remove(user);
-            for (Player player1 : room.getPlayerList()) {
-                if (player1.getUser().equals(user)) {
-                    room.getPlayerList().remove(player1);
-                    break;
-                }
-                continue;
+        if (room == null)
+            throw new NotFoundException("该房间不存在");
+        // Todo 房间内其他玩家退出房间失败
+        room.getUserList().remove(user);
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().equals(user)) {
+                room.getPlayerList().remove(player);
+                break;
             }
-            int roomsize = room.getPlayerList().size();
-            //检查房间内剩余人数是否为0,为0则解散
-            if (roomsize == 0) {
-                roomMap.remove(id);
-            }
-            return "退出房间成功";
         }
+        int roomSize = room.getPlayerList().size();
+        //检查房间内剩余人数是否为0,为0则解散
+        if (roomSize == 0) {
+            roomMap.remove(id);
+        }
+        return "退出房间成功";
     }
 
     /**
@@ -179,7 +176,10 @@ public class RoomComponent {
     }
 
     public Room getRoom(String roomId) {
-        return roomMap.get(roomId);
+        Room room = roomMap.get(roomId);
+        if (room == null)
+            throw new NotFoundException("该房间不存在");
+        return room;
     }
 
     public void updateRoom(Room newRoom) {

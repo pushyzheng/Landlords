@@ -27,11 +27,18 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
-            String token = httpRequest.getHeader("token");
+            String token = getTokenValue(httpRequest);
+            if (token == null) return false;
+
             /* 解密token，拿到用户的userId */
-            String userId = String.valueOf(JWTUtil.decode("token"));
-            attributes.put("userId", token);
-            logger.info(token + "连接到我了");
+            try {
+                String userId = String.valueOf(JWTUtil.decode(token));
+                attributes.put("userId", userId);
+                logger.info(userId + "连接到我了");
+            } catch (Exception e) {
+                logger.error("某用户webSocket连接失败");
+                return false;
+            }
         }
         return true;
     }
@@ -40,4 +47,10 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
     public void afterHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Exception e) {
 
     }
+
+    private String getTokenValue(HttpServletRequest httpRequest) {
+        String qs = httpRequest.getQueryString();
+        return qs.substring(6, qs.length());
+    }
+
 }

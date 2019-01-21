@@ -24,6 +24,9 @@ public class GameServiceImpl implements GameService {
     @Autowired
     private RoomComponent roomComponent;
 
+    @Autowired
+    private NotifyComponent notifyComponent;
+
     /**
      * 玩家准备游戏
      * @return 是否开局，当房间的内的所有玩家都准备，并且人数已满3人，即为开局
@@ -31,9 +34,6 @@ public class GameServiceImpl implements GameService {
     @Override
     public boolean readyGame(User user, ReadyGameDTO readyGameDTO) {
         Room room = roomComponent.getRoom(readyGameDTO.getRoomId());
-        if (room == null) {
-            throw new NotFoundException("房间不存在");
-        }
 
         /* 更改玩家的准备状态 */
         List<Player> playerList = room.getPlayerList();
@@ -68,10 +68,10 @@ public class GameServiceImpl implements GameService {
     public void startGame(String roomId) {
         Room room = roomComponent.getRoom(roomId);
         room.setStatus(RoomStatusEnum.PLAYING);
-
         roomComponent.updateRoom(room);
 
-        // Todo 通知所有的玩家客户端
+        /* 通过webSocket通知所有的玩家客户端开始游戏 */
+        notifyComponent.sendToAllUserOfRoom(roomId, "开始游戏！！");
     }
 
 

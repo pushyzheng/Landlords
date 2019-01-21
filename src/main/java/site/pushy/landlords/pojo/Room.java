@@ -32,4 +32,8 @@ public class Room {
         return status != null ? status.value() : "";
     }
 
+    public Room() {
+        this.locked = false;
+        this.status = RoomStatusEnum.PREPARING;
+    }
 }

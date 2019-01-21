@@ -31,6 +31,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String userId = (String) session.getAttributes().get("userId");
         userMap.put(userId, session);
+        session.sendMessage(new TextMessage("Hello World".getBytes()));
     }
 
     @Override
@@ -93,7 +94,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
         WebSocketSession session = userMap.get(userId);
 
         if (session == null) {
-            logger.error("用户：" + session.getId() + "不存在");
+            logger.error("用户" + userId + "Session 不存在");
             return false;
         }
 
