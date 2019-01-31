@@ -14,6 +14,9 @@ import site.pushy.landlords.service.GameService;
 
 import java.util.List;
 
+import static site.pushy.landlords.core.enums.IdentityEnum.FARMER;
+import static site.pushy.landlords.core.enums.IdentityEnum.LANDLORD;
+
 /**
  * @author Pushy
  * @since 2019/1/9 21:20
@@ -74,5 +77,32 @@ public class GameServiceImpl implements GameService {
         notifyComponent.sendToAllUserOfRoom(roomId, "开始游戏！！");
     }
 
+    /**
+     * 叫牌
+     * @param user
+     * @param roomId
+     */
+    @Override
+    public void wantCard(String roomId,User user) {
+        Room room = roomComponent.getRoom(roomId);
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().getId().equals(user.getId())) {
+                player.setIdentity(LANDLORD);
+            }else {
+                player.setIdentity(FARMER);
+            }
+            continue;
+        }
+        notifyComponent.sendToAllUserOfRoom(roomId, user.getUsername()+"成为地主！！");
+    }
 
+    /**
+     * 出牌
+     * @param roomId
+     * @param user
+     */
+    @Override
+    public void outCard(String roomId, User user) {
+
+    }
 }

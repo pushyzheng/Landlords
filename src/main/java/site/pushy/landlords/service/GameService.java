@@ -13,4 +13,7 @@ public interface GameService {
 
     void startGame(String roomId);
 
+    void wantCard(String roomId,User user);
+
+    void outCard(String roomId,User user);
 }
