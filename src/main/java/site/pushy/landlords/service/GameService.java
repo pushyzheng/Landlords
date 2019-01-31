@@ -1,7 +1,10 @@
 package site.pushy.landlords.service;
 
+import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
+
+import java.util.List;
 
 /**
  * @author Pushy
@@ -15,5 +18,9 @@ public interface GameService {
 
     void wantCard(String roomId,User user);
 
-    void outCard(String roomId,User user);
+    void noWantCard(String roomId,User user);
+
+    void outCard(String roomId,User user, List<Card> cardList);
+
+    void wantCardOrder(String roomId);
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
+import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.pojo.Player;
@@ -15,6 +16,7 @@ import site.pushy.landlords.pojo.ws.StartGameMessage;
 import site.pushy.landlords.service.GameService;
 
 import java.util.List;
+import java.util.Random;
 
 import static site.pushy.landlords.core.enums.IdentityEnum.FARMER;
 import static site.pushy.landlords.core.enums.IdentityEnum.LANDLORD;
@@ -84,7 +86,66 @@ public class GameServiceImpl implements GameService {
     }
 
     /**
-     * 叫牌
+     * 随机一家叫牌
+     * @param roomId
+     */
+    @Override
+    public void wantCardOrder(String roomId) {
+        Room room = roomComponent.getRoom(roomId);
+        int order = (int)(1+Math.random()*(3-1+1));//从1到3的int型随机数
+        for (Player player : room.getPlayerList()) {
+            if (player.getId().equals(order)) {
+                notifyComponent.sendToUser(player.getUser().getId(),"请选择是否叫牌");
+                break;
+            }
+            continue;
+        }
+    }
+
+    /**
+     * 轮到此人叫牌,选择不叫地主
+     * @param roomId
+     * @param user
+     */
+    @Override
+    public void noWantCard(String roomId, User user) {
+        Room room = roomComponent.getRoom(roomId);
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().getId().equals(user.getId())) {
+                int playerId = player.getId();
+                if (playerId==1){
+                    for (Player nextPlayer : room.getPlayerList()) {
+                        if (nextPlayer.getId()==2) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                            break;
+                        }
+                        continue;
+                    }
+                }else if (playerId==2){
+                    for (Player nextPlayer : room.getPlayerList()) {
+                        if (nextPlayer.getId()==3) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                            break;
+                        }
+                        continue;
+                    }
+                }else {
+                    for (Player nextPlayer : room.getPlayerList()) {
+                        if (nextPlayer.getId()==1) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                            break;
+                        }
+                        continue;
+                    }
+                }
+                break;
+            }
+            continue;
+        }
+    }
+
+    /**
+     * 叫牌,并分配身份
      * @param user
      * @param roomId
      */
@@ -108,7 +169,18 @@ public class GameServiceImpl implements GameService {
      * @param user
      */
     @Override
-    public void outCard(String roomId, User user) {
+    public void outCard(String roomId, User user, List<Card> cardList) {
+        Room room = roomComponent.getRoom(roomId);
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().getId().equals(user.getId())) {
+                for (Card card : cardList){
+                    player.getCards().remove(card);
+                }
+                notifyComponent.sendToAllUserOfRoom(roomId,user.getUsername()+"出的牌是"+cardList);
+                break;
+            }
+            continue;
+        }
 
     }
 }
