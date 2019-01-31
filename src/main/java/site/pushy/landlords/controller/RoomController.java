@@ -43,10 +43,15 @@ public class RoomController {
         Room room = roomComponent.getRoom(id);
         boolean canRead = false;
         for (User user : room.getUserList()) {
-            if (curUser.equals(user)) canRead = true;
+            if (curUser.getId().equals(user.getId())) {
+                canRead = true;
+                break;
+            }
+            continue;
         }
-        if (!canRead)
+        if (!canRead){
             throw new ForbiddenException("你无权查看本房间的信息");
+        }
         return RespEntity.success(roomComponent.getRoom(id));
     }
 

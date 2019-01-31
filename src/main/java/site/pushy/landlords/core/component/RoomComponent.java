@@ -137,16 +137,29 @@ public class RoomComponent {
      */
     public String exitRoom(String id, User user) {
         Room room = roomMap.get(id);
-        if (room == null)
+        if (room == null){
             throw new NotFoundException("该房间不存在");
+        }
         // Todo 房间内其他玩家退出房间失败
-        room.getUserList().remove(user);
+        for (User user1 : room.getUserList()) {
+            if (user1.getId().equals(user.getId())) {
+                room.getUserList().remove(user1);
+                break;
+            }
+            continue;
+        }
+
+
         for (Player player : room.getPlayerList()) {
-            if (player.getUser().equals(user)) {
+            if (player.getUser().getId().equals(user.getId())) {
                 room.getPlayerList().remove(player);
                 break;
             }
+            continue;
         }
+        System.out.println("退出房间成功");
+        System.out.println(room.getUserList());
+        System.out.println(room.getPlayerList());
         int roomSize = room.getPlayerList().size();
         //检查房间内剩余人数是否为0,为0则解散
         if (roomSize == 0) {
