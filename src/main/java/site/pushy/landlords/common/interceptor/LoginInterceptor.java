@@ -7,14 +7,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import site.pushy.landlords.common.util.JWTUtil;
-import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.PrintWriter;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {

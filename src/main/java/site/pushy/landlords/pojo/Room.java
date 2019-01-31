@@ -5,6 +5,7 @@ import org.springframework.web.socket.WebSocketSession;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,5 +36,23 @@ public class Room {
     public Room() {
         this.locked = false;
         this.status = RoomStatusEnum.PREPARING;
+        this.playerList = new ArrayList<>();
+        this.userList = new ArrayList<>();
+        this.userSessionList = new ArrayList<>();
     }
+
+    public Room(String id) {
+        this();
+        this.id = id;
+    }
+
+    public void addPlayer(Player player) {
+        this.playerList.add(player);
+    }
+
+    public void addUser(User user) {
+        this.userList.add(user);
+    }
+
+
 }

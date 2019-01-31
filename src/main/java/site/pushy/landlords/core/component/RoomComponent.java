@@ -19,37 +19,37 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RoomComponent {
 
-    private ConcurrentHashMap<String, Room> roomMap = new ConcurrentHashMap<>();
+    // 用户玩家当前所在的房间号映射Map
+    private Map<String, String> userRoomMap = new ConcurrentHashMap<>();
+
+    // 房间号和与该房间所对应的Room对象映射Map
+    private Map<String, Room> roomMap = new ConcurrentHashMap<>();
 
     /**
      * 创建房间
-     *
      * @param user
      * @return
      */
     public Room createRoom(User user, String roomPassword) {
-        Room room = new Room();
-        String roomid = newRoomid();
+        if (getUserRoom(user.getId()) != null) {
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoom(user.getId()) + " 的房间");
+        }
+        String roomId = newRoomid();
+        Room room = new Room(roomId);
         Player player = new Player();
         player.setUser(user);
         player.setId(1);  //创建房间的人座位顺序为1
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        List<Player> playerList = new ArrayList<>();
-        playerList.add(player);
-        room.setId(roomid);
-        room.setUserList(userList);
-        room.setPlayerList(playerList);
+        room.addUser(user);
+        room.addPlayer(player);
+
         //是否设置密码
         if (roomPassword != null && !roomPassword.isEmpty()) {
             //设置了
             room.setLocked(true);
             room.setPassword(roomPassword);
-        } else {
-            //没设置
-            room.setLocked(false);
         }
-        roomMap.put(roomid, room);
+        roomMap.put(roomId, room);
+        setUserRoom(user.getId(), roomId);
         return room;
     }
 
@@ -61,6 +61,9 @@ public class RoomComponent {
      * @author fuxing
      */
     public String joinRoom(String id, User user, String roomPassword) {
+        if (getUserRoom(user.getId()) != null) {
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoom(user.getId()) + " 的房间");
+        }
         Room room = roomMap.get(id);
         //检查房间是否存在
         if (room == null) {
@@ -109,6 +112,8 @@ public class RoomComponent {
                             player.setUser(user);
                             room.getUserList().add(user);
                             room.getPlayerList().add(player);
+
+                            setUserRoom(user.getId(), room.getId());
                             return "加入成功!";
 
                         } else {
@@ -132,10 +137,13 @@ public class RoomComponent {
 
     /**
      * 退出房间
+     *
      * @param id
      * @param user
      */
     public String exitRoom(String id, User user) {
+        removeUserRoom(user.getId());
+
         Room room = roomMap.get(id);
         if (room == null)
             throw new NotFoundException("该房间不存在");
@@ -154,14 +162,6 @@ public class RoomComponent {
         }
         return "退出房间成功";
     }
-
-    /**
-     * 发送消息给所有房间中的玩家
-     */
-    public boolean sendMessageToRoom(String id, String message) {
-        return false;
-    }
-
 
     /**
      * 列出所有已创建的房间
@@ -196,12 +196,10 @@ public class RoomComponent {
     public Player getNextPlayer(String id, User user) {
         Room room = roomMap.get(id);
         Map<Integer, Player> playerIdMap = new HashMap<>();
-        for (Player player : room.getPlayerList()
-        ) {
+        for (Player player : room.getPlayerList()) {
             playerIdMap.put(player.getId(), player);
         }
-        for (Player player1 : room.getPlayerList()
-        ) {
+        for (Player player1 : room.getPlayerList()) {
             if (player1.getUser().equals(user)) {
                 int playerId = player1.getId();
                 switch (playerId) {
@@ -214,7 +212,6 @@ public class RoomComponent {
                 }
                 break;
             }
-            continue;
         }
         return null;
     }
@@ -226,7 +223,7 @@ public class RoomComponent {
         Room room = roomMap.get(id);
         Map<Player, List<Card>> cardMap = new HashMap<>();
         for (Player player : room.getPlayerList()
-        ) {
+                ) {
             List<Card> cardList = player.getCards();
             cardMap.put(player, cardList);
         }
@@ -234,9 +231,30 @@ public class RoomComponent {
     }
 
     /**
+     * 设置用户当前所在的房间号
+     */
+    private void setUserRoom(String userId, String roomId) {
+        userRoomMap.put(userId, roomId);
+    }
+
+    /**
+     * 移除用户当前所在房间的映射关系
+     */
+    private void removeUserRoom(String userId) {
+        userRoomMap.remove(userId);
+    }
+
+    /**
+     * 获取用户当前所在的房间号
+     */
+    private String getUserRoom(String userId) {
+        return userRoomMap.get(userId);
+    }
+
+    /**
      * 生成不同的roomid
      */
-    public String newRoomid() {
+    private String newRoomid() {
         //随机生成房间id
         int a = (int) ((Math.random() * 9 + 1) * 100000);
         String roomid = String.valueOf(a);
