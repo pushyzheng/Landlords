@@ -5,11 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.ws.Message;
+import site.pushy.landlords.pojo.ws.PlayerExitMessage;
+import site.pushy.landlords.pojo.ws.PlayerJoinMessage;
 
 import javax.validation.Valid;
 
@@ -23,6 +27,9 @@ public class RoomController {
 
     @Autowired
     private RoomComponent roomComponent;
+
+    @Autowired
+    private NotifyComponent notifyComponent;
 
     /**
      * 获取所有房间列表
@@ -47,7 +54,6 @@ public class RoomController {
                 canRead = true;
                 break;
             }
-            continue;
         }
         if (!canRead){
             throw new ForbiddenException("你无权查看本房间的信息");
@@ -77,6 +83,11 @@ public class RoomController {
         }
         String roomPassword = roomDTO.getPassword();
         String message = roomComponent.joinRoom(roomId, curUser, roomPassword);
+
+        /* 通知房间内的玩家客户端有新的玩家加入 */
+        Message playerJoinMessage = new PlayerJoinMessage(curUser);
+        notifyComponent.sendToAllUserOfRoom(roomId, playerJoinMessage);
+
         return RespEntity.success(message);
     }
 
@@ -88,6 +99,9 @@ public class RoomController {
                            @SessionAttribute User curUser) {
         String roomId = roomDTO.getId();
         String message = roomComponent.exitRoom(roomId, curUser);
+        /* 通知房间内的玩家客户端有玩家退出 */
+        Message playerJoinMessage = new PlayerExitMessage(curUser);
+        notifyComponent.sendToAllUserOfRoom(roomId, playerJoinMessage);
         return RespEntity.success(message);
     }
 

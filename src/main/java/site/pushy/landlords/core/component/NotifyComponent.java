@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import site.pushy.landlords.common.handler.WebSocketPushHandler;
+import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.ws.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,11 @@ public class NotifyComponent {
             userIdList.add(user.getId());
         }
         return webSocketHandler.sendToUsers(userIdList, content);
+    }
+
+    public boolean sendToAllUserOfRoom(String roomId, Message message) {
+        String content = RespEntity.message(message);
+        return this.sendToAllUserOfRoom(roomId, content);
     }
 
     /**

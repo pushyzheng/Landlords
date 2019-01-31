@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.NotFoundException;
 import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
 
@@ -18,7 +19,7 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
-    @GetMapping("/me")
+    @GetMapping("/myself")
     public String getMyUser(@SessionAttribute User curUser) {
         return RespEntity.success(curUser);
     }

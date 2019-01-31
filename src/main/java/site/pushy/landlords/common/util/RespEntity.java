@@ -1,7 +1,11 @@
 package site.pushy.landlords.common.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import site.pushy.landlords.pojo.ws.Message;
+import site.pushy.landlords.pojo.ws.ReadyGameMessage;
+import site.pushy.landlords.pojo.ws.StartGameMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +30,10 @@ public class RespEntity {
 
     public static String error(Integer code, String message) {
         return toJsonString(code, message, null);
+    }
+
+    public static String message(Message message) {
+        return JSON.toJSONString(message);
     }
 
 }

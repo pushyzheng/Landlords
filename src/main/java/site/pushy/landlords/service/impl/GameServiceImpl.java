@@ -2,7 +2,6 @@ package site.pushy.landlords.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import site.pushy.landlords.common.exception.NotFoundException;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
@@ -10,6 +9,9 @@ import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.ws.Message;
+import site.pushy.landlords.pojo.ws.ReadyGameMessage;
+import site.pushy.landlords.pojo.ws.StartGameMessage;
 import site.pushy.landlords.service.GameService;
 
 import java.util.List;
@@ -60,6 +62,10 @@ public class GameServiceImpl implements GameService {
                 }
             }
         }
+
+        /* 通知其他房间的所有玩家准备游戏 */
+        Message readyGameMessage = new ReadyGameMessage(user.getId());
+        notifyComponent.sendToAllUserOfRoom(room.getId(), readyGameMessage);
         return res;
     }
 
@@ -73,8 +79,8 @@ public class GameServiceImpl implements GameService {
         room.setStatus(RoomStatusEnum.PLAYING);
         roomComponent.updateRoom(room);
 
-        /* 通过webSocket通知所有的玩家客户端开始游戏 */
-        notifyComponent.sendToAllUserOfRoom(roomId, "开始游戏！！");
+        /* 通知所有的玩家客户端开始游戏 */
+        notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
     }
 
     /**
