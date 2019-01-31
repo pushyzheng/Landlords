@@ -47,13 +47,17 @@ public class RoomController {
     @GetMapping("/{id}")
     public String getRoomById(@PathVariable String id,
                               @SessionAttribute User curUser) {
-//        Room room = roomComponent.getRoom(id);
-//        boolean canRead = false;
-//        for (User user : room.getUserList()) {
-//            if (curUser.equals(user)) canRead = true;
-//        }
-//        if (!canRead)
-//            throw new ForbiddenException("你无权查看本房间的信息");
+        Room room = roomComponent.getRoom(id);
+        boolean canRead = false;
+        for (User user : room.getUserList()) {
+            if (curUser.getId().equals(user.getId())) {
+                canRead = true;
+                break;
+            }
+        }
+        if (!canRead){
+            throw new ForbiddenException("你无权查看本房间的信息");
+        }
         return RespEntity.success(roomComponent.getRoom(id));
     }
 
