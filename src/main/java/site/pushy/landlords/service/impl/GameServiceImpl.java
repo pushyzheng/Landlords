@@ -103,7 +103,7 @@ public class GameServiceImpl implements GameService {
     }
 
     /**
-     * 轮到此人叫牌,选择不叫地主
+     * 轮到此人叫牌,选择不叫地主.将叫地主消息传递给下一家
      * @param roomId
      * @param user
      */
