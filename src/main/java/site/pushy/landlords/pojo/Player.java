@@ -4,6 +4,7 @@ import lombok.Data;
 import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.pojo.DO.User;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,6 +29,27 @@ public class Player implements Comparable<Player> {
             return identity.getName();
         }
         return "";
+    }
+
+    /**
+     * 获取当前玩家的下一家id
+     * @return
+     */
+    public int getNextPlayerId() {
+        return id == 3 ? 1 : id + 1;
+    }
+
+    public void addCards(List<Card> cardList) {
+        cards.addAll(cardList);
+        // 添加地主牌后重新按照等级排序
+        Collections.sort(cards);
+    }
+
+    public void removeCards(List<Card> cardList) {
+        for (Card card : cardList) {
+            cards.remove(card);
+        }
+        Collections.sort(cards);
     }
 
     @Override

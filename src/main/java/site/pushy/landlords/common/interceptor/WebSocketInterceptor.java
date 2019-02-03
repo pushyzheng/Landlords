@@ -34,7 +34,6 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
             try {
                 String userId = String.valueOf(JWTUtil.decode(token));
                 attributes.put("userId", userId);
-                logger.info(userId + "连接到我了");
             } catch (Exception e) {
                 logger.error("某用户webSocket连接失败");
                 return false;

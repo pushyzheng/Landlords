@@ -1,25 +1,22 @@
 package site.pushy.landlords.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import site.pushy.landlords.core.CardDistribution;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
+import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
-import site.pushy.landlords.pojo.ws.Message;
-import site.pushy.landlords.pojo.ws.ReadyGameMessage;
-import site.pushy.landlords.pojo.ws.StartGameMessage;
+import site.pushy.landlords.pojo.ws.*;
 import site.pushy.landlords.service.GameService;
 
 import java.util.List;
-import java.util.Random;
-
-import static site.pushy.landlords.core.enums.IdentityEnum.FARMER;
-import static site.pushy.landlords.core.enums.IdentityEnum.LANDLORD;
 
 /**
  * @author Pushy
@@ -27,6 +24,8 @@ import static site.pushy.landlords.core.enums.IdentityEnum.LANDLORD;
  */
 @Service
 public class GameServiceImpl implements GameService {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private RoomComponent roomComponent;
@@ -39,8 +38,8 @@ public class GameServiceImpl implements GameService {
      * @return 是否开局，当房间的内的所有玩家都准备，并且人数已满3人，即为开局
      */
     @Override
-    public boolean readyGame(User user, ReadyGameDTO readyGameDTO) {
-        Room room = roomComponent.getRoom(readyGameDTO.getRoomId());
+    public boolean readyGame(User user) {
+        Room room = roomComponent.getUserRoom(user.getId());
 
         /* 更改玩家的准备状态 */
         List<Player> playerList = room.getPlayerList();
@@ -78,109 +77,111 @@ public class GameServiceImpl implements GameService {
     @Override
     public void startGame(String roomId) {
         Room room = roomComponent.getRoom(roomId);
-        room.setStatus(RoomStatusEnum.PLAYING);
+        room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
+
+        /* 构造 CardDistribution类，进行发牌 */
+        CardDistribution distribution = room.getDistribution();
+        if (distribution == null) {
+            distribution = new CardDistribution();
+            room.setDistribution(distribution);
+        }
+        distribution.refresh();  // 洗牌
+
+        List<Player> playerList = room.getPlayerList();
+        for (Player player : playerList) {
+            List<Card> cards = distribution.getCards(player.getId());
+            player.setCards(cards);
+        }
+
         roomComponent.updateRoom(room);
-
-        /* 通知所有的玩家客户端开始游戏 */
+        /* 通知房间内所有的玩家客户端开始游戏 */
         notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
-    }
 
-    /**
-     * 随机一家叫牌
-     * @param roomId
-     */
-    @Override
-    public void wantCardOrder(String roomId) {
-        Room room = roomComponent.getRoom(roomId);
-        int order = (int)(1+Math.random()*(3-1+1));//从1到3的int型随机数
+        /* 在分牌之后随机分牌一个玩家进行叫地主 */
+        int order = (int) (1 + Math.random() * (3 - 1 + 1));  //从1到3的int型随机数
         for (Player player : room.getPlayerList()) {
             if (player.getId().equals(order)) {
-                notifyComponent.sendToUser(player.getUser().getId(),"请选择是否叫牌");
+                // 通知被选择叫牌的玩家客户端开始叫牌
+                logger.info(String.format("【%s】通知玩家 %s 叫牌", room.getId(), player.getUser().getUsername()));
+                notifyComponent.sendToUser(player.getUser().getId(), new BidMessage());
                 break;
             }
-            continue;
         }
     }
 
-    /**
-     * 轮到此人叫牌,选择不叫地主.将叫地主消息传递给下一家
-     * @param roomId
-     * @param user
-     */
     @Override
-    public void noWantCard(String roomId, User user) {
-        Room room = roomComponent.getRoom(roomId);
+    public void want(User user) {
+        Room room = roomComponent.getUserRoom(user.getId());
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().getId().equals(user.getId())) {
+                player.setIdentity(IdentityEnum.LANDLORD);
+                // 将三张地主牌分配给地主
+                CardDistribution distribution = room.getDistribution();
+                player.addCards(distribution.getTopCards());
+            } else {
+                player.setIdentity(IdentityEnum.FARMER);
+            }
+        }
+        roomComponent.updateRoom(room);
+        /* 通知玩家内所有玩家，叫牌结束 */
+        notifyComponent.sendToAllUserOfRoom(room.getId(), new BidEndMessage());
+    }
+
+    @Override
+    public void noWant(User user) {
+        Room room = roomComponent.getUserRoom(user.getId());
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
                 int playerId = player.getId();
-                if (playerId==1){
+                if (playerId == 1) {
                     for (Player nextPlayer : room.getPlayerList()) {
-                        if (nextPlayer.getId()==2) {
-                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                        if (nextPlayer.getId() == 2) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(), new BidMessage());
                             break;
                         }
-                        continue;
                     }
-                }else if (playerId==2){
+                } else if (playerId == 2) {
                     for (Player nextPlayer : room.getPlayerList()) {
-                        if (nextPlayer.getId()==3) {
-                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                        if (nextPlayer.getId() == 3) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(), new BidMessage());
                             break;
                         }
-                        continue;
                     }
-                }else {
+                } else {
                     for (Player nextPlayer : room.getPlayerList()) {
-                        if (nextPlayer.getId()==1) {
-                            notifyComponent.sendToUser(nextPlayer.getUser().getId(),"请选择是否叫牌");
+                        if (nextPlayer.getId() == 1) {
+                            notifyComponent.sendToUser(nextPlayer.getUser().getId(), new BidMessage());
                             break;
                         }
-                        continue;
                     }
                 }
+                logger.info(String.format("玩家 %d 选择不叫，由下家玩家 %d 叫牌", playerId,
+                        playerId == 3 ? 1 : playerId + 1));
                 break;
             }
-            continue;
         }
     }
 
-    /**
-     * 叫牌,并分配身份
-     * @param user
-     * @param roomId
-     */
     @Override
-    public void wantCard(String roomId,User user) {
-        Room room = roomComponent.getRoom(roomId);
+    public void playCard(User user, List<Card> cardList) {
+        Room room = roomComponent.getUserRoom(user.getId());
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
-                player.setIdentity(LANDLORD);
-            }else {
-                player.setIdentity(FARMER);
-            }
-            continue;
-        }
-        notifyComponent.sendToAllUserOfRoom(roomId, user.getUsername()+"成为地主！！");
-    }
+                player.removeCards(cardList);
 
-    /**
-     * 出牌
-     * @param roomId
-     * @param user
-     */
-    @Override
-    public void outCard(String roomId, User user, List<Card> cardList) {
-        Room room = roomComponent.getRoom(roomId);
-        for (Player player : room.getPlayerList()) {
-            if (player.getUser().getId().equals(user.getId())) {
-                for (Card card : cardList){
-                    player.getCards().remove(card);
-                }
-                notifyComponent.sendToAllUserOfRoom(roomId,user.getUsername()+"出的牌是"+cardList);
+                /* 通知房间内的所有玩家客户端有玩家出牌 */
+                Message message = new PlayCardMessage(user.getId(), cardList);
+                notifyComponent.sendToAllUserOfRoom(room.getId(), message);
+                /* 通知下一个玩家出牌 */
+                User nextUser = room.getUserByPlayerId(player.getNextPlayerId());
+                notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
                 break;
             }
-            continue;
         }
+    }
+
+    @Override
+    public void pass(User user) {
 
     }
 }

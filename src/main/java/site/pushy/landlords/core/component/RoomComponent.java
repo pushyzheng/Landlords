@@ -31,8 +31,8 @@ public class RoomComponent {
      * @return
      */
     public Room createRoom(User user, String roomPassword) {
-        if (getUserRoom(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoom(user.getId()) + " 的房间");
+        if (getUserRoomId(user.getId()) != null) {
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
         }
         String roomId = newRoomid();
         Room room = new Room(roomId);
@@ -61,8 +61,8 @@ public class RoomComponent {
      * @author fuxing
      */
     public String joinRoom(String id, User user, String roomPassword) {
-        if (getUserRoom(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoom(user.getId()) + " 的房间");
+        if (getUserRoomId(user.getId()) != null) {
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
         }
         Room room = roomMap.get(id);
         //检查房间是否存在
@@ -154,7 +154,6 @@ public class RoomComponent {
                 room.getUserList().remove(user1);
                 break;
             }
-            continue;
         }
 
 
@@ -163,7 +162,6 @@ public class RoomComponent {
                 room.getPlayerList().remove(player);
                 break;
             }
-            continue;
         }
         System.out.println("退出房间成功");
         System.out.println(room.getUserList());
@@ -232,15 +230,39 @@ public class RoomComponent {
     /**
      * 列出房间内每个玩家的牌
      */
-    public Map<Player, List<Card>> getPlayerCards(String id) {
+    public Map<Player, List<Card>> getRoomCards(String id) {
         Room room = roomMap.get(id);
         Map<Player, List<Card>> cardMap = new HashMap<>();
-        for (Player player : room.getPlayerList()
-                ) {
+        for (Player player : room.getPlayerList()) {
             List<Card> cardList = player.getCards();
             cardMap.put(player, cardList);
         }
         return cardMap;
+    }
+
+    /**
+     * 通过userId获取当前用户在其房间内游戏内的牌列表
+     * @param userId
+     */
+    public List<Card> getUserCards(String userId) {
+        Room room = getUserRoom(userId);
+        for (Player player : room.getPlayerList()) {
+            if (player.getUser().getId().equals(userId)) {
+                return player.getCards();
+            }
+        }
+        throw new NotFoundException("未找到该玩家");
+    }
+
+    /**
+     * 获取当前用户所在的房间对象
+     */
+    public Room getUserRoom(String userId) {
+        String roomId = userRoomMap.get(userId);
+        if (roomId == null) {
+            throw new BadRequestException("玩家还未加入房间内");
+        }
+        return roomMap.get(roomId);
     }
 
     /**
@@ -260,7 +282,7 @@ public class RoomComponent {
     /**
      * 获取用户当前所在的房间号
      */
-    private String getUserRoom(String userId) {
+    private String getUserRoomId(String userId) {
         return userRoomMap.get(userId);
     }
 

@@ -10,7 +10,13 @@ public enum WsMessageTypeEnum {
     START_GAME("开始游戏"),
 
     PLAYER_JOIN("有玩家加入"),
-    PLAYER_EXIT("有玩家退出");
+    PLAYER_EXIT("有玩家退出"),
+
+    BID("叫牌"),
+    BID_END("叫牌结束"),
+
+    PLAY_CARD("有玩家出牌"),
+    PLEASE_PLAY_CARD("请出牌");
 
     private String value;
 

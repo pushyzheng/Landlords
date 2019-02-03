@@ -56,7 +56,6 @@ public class WebSocketPushHandler implements WebSocketHandler {
             session.close();
         }
         String userId = (String) session.getAttributes().get("userId");
-        logger.info(userId + "退出了系统");
         userMap.remove(userId);
     }
 
@@ -94,10 +93,8 @@ public class WebSocketPushHandler implements WebSocketHandler {
         WebSocketSession session = userMap.get(userId);
 
         if (session == null) {
-            logger.error("用户" + userId + "Session 不存在");
             return false;
         }
-
         try {
             if (!session.isOpen()) {
                 logger.error("用户不在线");

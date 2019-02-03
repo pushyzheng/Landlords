@@ -2,6 +2,7 @@ package site.pushy.landlords.pojo;
 
 import lombok.Data;
 import org.springframework.web.socket.WebSocketSession;
+import site.pushy.landlords.core.CardDistribution;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 
@@ -29,6 +30,8 @@ public class Room {
 
     private List<WebSocketSession> userSessionList;  // 当家玩家客户端Session对象列表
 
+    private CardDistribution distribution;
+
     public String getStatusValue() {
         return status != null ? status.value() : "";
     }
@@ -54,5 +57,16 @@ public class Room {
         this.userList.add(user);
     }
 
+    public Player getPlayerById(int playerId) {
+        for (Player player : playerList) {
+            if (player.getId() == playerId) return player;
+        }
+        return null;
+    }
+
+    public User getUserByPlayerId(int playerId) {
+        Player player = getPlayerById(playerId);
+        return player.getUser();
+    }
 
 }

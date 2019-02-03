@@ -32,8 +32,4 @@ public class RespEntity {
         return toJsonString(code, message, null);
     }
 
-    public static String message(Message message) {
-        return JSON.toJSONString(message);
-    }
-
 }

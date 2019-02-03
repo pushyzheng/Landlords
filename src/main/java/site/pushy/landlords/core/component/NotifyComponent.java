@@ -1,5 +1,6 @@
 package site.pushy.landlords.core.component;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -40,7 +41,7 @@ public class NotifyComponent {
     }
 
     public boolean sendToAllUserOfRoom(String roomId, Message message) {
-        String content = RespEntity.message(message);
+        String content = JSON.toJSONString(message);
         return this.sendToAllUserOfRoom(roomId, content);
     }
 
@@ -50,6 +51,11 @@ public class NotifyComponent {
      * @param content
      */
     public boolean sendToUser(String userId, String content) {
+        return webSocketHandler.sendToUser(userId, content);
+    }
+
+    public boolean sendToUser(String userId, Message message) {
+        String content = JSON.toJSONString(message);
         return webSocketHandler.sendToUser(userId, content);
     }
 
