@@ -1,3 +1,5 @@
+server:
+  port: 80
 spring:
     datasource:
         name: test
