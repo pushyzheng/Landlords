@@ -1,13 +1,15 @@
 package site.pushy.landlords.controller;
 
-import com.qq.connect.QQConnectException;
 import com.qq.connect.api.OpenID;
 import com.qq.connect.api.qzone.UserInfo;
 import com.qq.connect.javabeans.AccessToken;
 import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.JWTUtil;
 import site.pushy.landlords.common.util.RespEntity;
@@ -20,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -31,6 +31,9 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "", produces = "application/json")
 public class AuthController {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String FRONT_END_CALLBACK_URL = "http://localhost:9000/#/oauth/";
 
     @Autowired
     private UserMapper userMapper;
@@ -49,20 +52,53 @@ public class AuthController {
                 throw new UnauthorizedException("账号或密码错误");
             }
         }
-
-        /* 保存用户登录对象到 Session，并返回客户端Token令牌 */
-        HttpSession session = request.getSession();
-        session.setAttribute("curUser", user);
-        String token = JWTUtil.encode(user.getId());
-        return RespEntity.success(token);
+        return saveSession(request, user);
     }
 
-    public User getUserByName(String username) {
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
-        criteria.andUsernameEqualTo(username);
-        List<User> users = userMapper.selectByExample(userExample);
-        return users.isEmpty() ? null : users.get(0);
+    /**
+     * qq登录
+     */
+    @GetMapping(value = "/qqLogin")
+    public void qqLogin(HttpServletRequest request, HttpServletResponse response) {
+        response.setContentType("text/html;charset=utf-8");
+        try {
+            // 将页面重定向到qq第三方的登录页面
+            response.sendRedirect(new Oauth().getAuthorizeURL(request));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 用户授权成功之后回调的地址
+     */
+    @GetMapping("/connect/callback")
+    public void callback(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            AccessToken accessTokenObj = new Oauth().getAccessTokenByRequest(request);
+            String accessToken;
+            if (accessTokenObj.getAccessToken().equals("")) {
+                throw new BadRequestException("没有获取到响应参数");
+            }
+            accessToken = accessTokenObj.getAccessToken();
+            String openid = new OpenID(accessToken).getUserOpenID();
+            User user = getUserByOpenId(openid);
+            if (user == null) {
+                /* 获取用户的QQ昵称、头像等信息 */
+                UserInfoBean userInfo = new UserInfo(accessToken, openid).getUserInfo();
+                logger.info("用户【" + userInfo.getNickname() + "】 通过第三方登录，openId => " + openid);
+                if (userInfo == null) {
+                    throw new BadRequestException("没有获取到响应参数");
+                }
+                user = new User(userInfo.getNickname(), "", openid, userInfo.getAvatar().getAvatarURL100());
+                user.setGender(userInfo.getGender());
+                userMapper.insert(user);
+            }
+            String token = saveSession(request, user);
+            response.sendRedirect(FRONT_END_CALLBACK_URL + token);
+        } catch (Exception e) {
+            qqLogin(request, response);
+        }
     }
 
     /**
@@ -73,61 +109,29 @@ public class AuthController {
         throw new UnauthorizedException("请先登录");
     }
 
-
     /**
-     * qq登录
+     * 保存用户登录对象到 Session，并返回客户端Token令牌
      */
-    @RequestMapping(value = "/qqLogin",method = RequestMethod.GET)
-    public void qqLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        response.setContentType("text/html;charset=utf-8");
-        try {
-            response.sendRedirect(new Oauth().getAuthorizeURL(request));//将页面重定向到qq第三方的登录页面
-        } catch (QQConnectException e) {
-            e.printStackTrace();
-        }
+    private String saveSession(HttpServletRequest request, User user) {
+        HttpSession session = request.getSession();
+        session.setAttribute("curUser", user);
+        return JWTUtil.encode(user.getId());
     }
 
-    /**
-     * 用户授权成功之后回调的地址
-     */
-    @GetMapping("/connect/callback")
-    public String callback(HttpServletRequest request) {
-        try {
-            // 获取AccessToken(AccessToken用于获取OppendID)
-            AccessToken accessTokenObj = new Oauth().getAccessTokenByRequest(request);
+    private User getUserByName(String username) {
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andUsernameEqualTo(username);
+        List<User> users = userMapper.selectByExample(userExample);
+        return users.isEmpty() ? null : users.get(0);
+    }
 
-            System.out.println("accessTokenObj:"+accessTokenObj);
-            // 用于接收AccessToken
-            String accessToken   = null,
-                    openID        = null;
-            long tokenExpireIn = 0L; // AccessToken有效时长
-
-            if (accessTokenObj.getAccessToken().equals("")) {
-                //                我们的网站被CSRF攻击了或者用户取消了授权
-                //                做一些数据统计工作
-                System.out.print("没有获取到响应参数");
-            } else {
-                accessToken = accessTokenObj.getAccessToken();  // 获取AccessToken
-                tokenExpireIn = accessTokenObj.getExpireIn();
-
-                // 利用获取到的accessToken 去获取当前用的openid -------- start
-                OpenID openIDObj =  new OpenID(accessToken);
-                // 通过对象获取[OpendId]（OpendID用于获取QQ登录用户的信息）
-                openID = openIDObj.getUserOpenID();
-
-                System.out.println(openID);
-                // 通过OpenID获取QQ用户登录信息对象(Oppen_ID代表着QQ用户的唯一标识)
-                UserInfo qzoneUserInfo = new UserInfo(accessToken, openID);
-                // 获取用户信息对象(只获取nickename与Gender)
-                UserInfoBean userInfoBean = qzoneUserInfo.getUserInfo();
-
-                System.out.println(userInfoBean.getAvatar());
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "ok";
+    public User getUserByOpenId(String openid) {
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andOpenidEqualTo(openid);
+        List<User> users = userMapper.selectByExample(userExample);
+        return users.isEmpty() ? null : users.get(0);
     }
 
 }

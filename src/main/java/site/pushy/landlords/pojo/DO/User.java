@@ -1,5 +1,6 @@
 package site.pushy.landlords.pojo.DO;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,6 +19,8 @@ public class User {
     private String username;
 
     private String password;
+
+    private String openid;
 
     private String gender;
 
@@ -39,6 +42,12 @@ public class User {
         this.password = password;
     }
 
+    public User(String username, String password, String openid, String avatar) {
+        this(username, password);
+        this.openid = openid;
+        this.avatar = avatar;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,4 +61,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(super.hashCode(), id);
     }
+
 }

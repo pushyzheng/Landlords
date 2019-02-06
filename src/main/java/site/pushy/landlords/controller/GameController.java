@@ -33,6 +33,9 @@ public class GameController {
     @Autowired
     private PlayerService playerService;
 
+    /**
+     * 准备
+     */
     @PostMapping("/ready")
     public String readyGame(@SessionAttribute User curUser,
                             @Valid @RequestBody ReadyGameDTO readyGameDTO) {
@@ -49,18 +52,18 @@ public class GameController {
     @GetMapping("/cards")
     public String getCardsByPlayerId(@SessionAttribute User curUser) {
         List<Card> cards = playerService.getPlayerCards(curUser);
-        List<Integer> res = cards.stream()
-                .map(Card::getNumberValue)
-                .collect(Collectors.toList());
-        return RespEntity.success(res);
+        return RespEntity.success(cards);
     }
 
+    /**
+     * 叫牌
+     */
     @PostMapping("/bid")
     public String bid(@Valid @RequestBody BidDTO bidDTO,
                       @SessionAttribute User curUser) {
         // 轮到此人叫牌，选择不叫地主，将叫地主消息传递给下一家
         if (bidDTO.isWant()) {
-            gameService.want(curUser);
+            gameService.want(curUser, bidDTO.getScore());
             return RespEntity.success("已叫地主并分配身份");
         }
         // 叫牌，并分配身份
@@ -72,13 +75,18 @@ public class GameController {
 
     /**
      * 出牌
-     * @return
      */
-    @PostMapping("/out")
+    @PostMapping("/play")
     public String outCard(@SessionAttribute User curUser,
                           @RequestBody List<Card> cardList){
         gameService.playCard(curUser,cardList);
-        return RespEntity.success("已出牌"+cardList);
+        return RespEntity.success("success");
+    }
+
+    @PostMapping("/pass")
+    public String pass(@SessionAttribute User curUser) {
+        gameService.pass(curUser);
+        return RespEntity.success("success");
     }
 
 }

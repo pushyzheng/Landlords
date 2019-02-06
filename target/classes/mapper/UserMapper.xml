@@ -5,6 +5,7 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="openid" jdbcType="VARCHAR" property="openid" />
     <result column="gender" jdbcType="VARCHAR" property="gender" />
     <result column="money" jdbcType="DOUBLE" property="money" />
     <result column="avatar" jdbcType="VARCHAR" property="avatar" />
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, username, password, gender, money, avatar, timestamp
+    id, username, password, openid, gender, money, avatar, timestamp
   </sql>
   <select id="selectByExample" parameterType="site.pushy.landlords.pojo.DO.UserExample" resultMap="BaseResultMap">
     select
@@ -103,11 +104,11 @@
   </delete>
   <insert id="insert" parameterType="site.pushy.landlords.pojo.DO.User">
     insert into user (id, username, password, 
-      gender, money, avatar, 
-      timestamp)
+      openid, gender, money, 
+      avatar, timestamp)
     values (#{id,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{gender,jdbcType=VARCHAR}, #{money,jdbcType=DOUBLE}, #{avatar,jdbcType=VARCHAR}, 
-      #{timestamp,jdbcType=TIMESTAMP})
+      #{openid,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR}, #{money,jdbcType=DOUBLE}, 
+      #{avatar,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="site.pushy.landlords.pojo.DO.User">
     insert into user
@@ -120,6 +121,9 @@
       </if>
       <if test="password != null">
         password,
+      </if>
+      <if test="openid != null">
+        openid,
       </if>
       <if test="gender != null">
         gender,
@@ -143,6 +147,9 @@
       </if>
       <if test="password != null">
         #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="openid != null">
+        #{openid,jdbcType=VARCHAR},
       </if>
       <if test="gender != null">
         #{gender,jdbcType=VARCHAR},
@@ -176,6 +183,9 @@
       <if test="record.password != null">
         password = #{record.password,jdbcType=VARCHAR},
       </if>
+      <if test="record.openid != null">
+        openid = #{record.openid,jdbcType=VARCHAR},
+      </if>
       <if test="record.gender != null">
         gender = #{record.gender,jdbcType=VARCHAR},
       </if>
@@ -198,6 +208,7 @@
     set id = #{record.id,jdbcType=VARCHAR},
       username = #{record.username,jdbcType=VARCHAR},
       password = #{record.password,jdbcType=VARCHAR},
+      openid = #{record.openid,jdbcType=VARCHAR},
       gender = #{record.gender,jdbcType=VARCHAR},
       money = #{record.money,jdbcType=DOUBLE},
       avatar = #{record.avatar,jdbcType=VARCHAR},
@@ -214,6 +225,9 @@
       </if>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="openid != null">
+        openid = #{openid,jdbcType=VARCHAR},
       </if>
       <if test="gender != null">
         gender = #{gender,jdbcType=VARCHAR},
@@ -234,6 +248,7 @@
     update user
     set username = #{username,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
+      openid = #{openid,jdbcType=VARCHAR},
       gender = #{gender,jdbcType=VARCHAR},
       money = #{money,jdbcType=DOUBLE},
       avatar = #{avatar,jdbcType=VARCHAR},

@@ -31,7 +31,6 @@ public class WebSocketPushHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String userId = (String) session.getAttributes().get("userId");
         userMap.put(userId, session);
-        session.sendMessage(new TextMessage("Hello World".getBytes()));
     }
 
     @Override

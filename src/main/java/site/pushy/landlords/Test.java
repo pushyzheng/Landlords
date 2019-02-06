@@ -1,7 +1,7 @@
 package site.pushy.landlords;
 
+import site.pushy.landlords.core.TypeJudgement;
 import site.pushy.landlords.core.enums.CardGradeEnum;
-import site.pushy.landlords.core.JudgeType;
 import site.pushy.landlords.pojo.Card;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class Test {
         d.setNumber(CardNumberEnum.ONE);
 
         List<Card> cards = Arrays.asList(a, b, c, d);
-        System.out.println(JudgeType.isThreeWithOne(cards));*/
+        System.out.println(TypeJudgement.isThreeWithOne(cards));*/
 
         /*Card a = new Card();
         a.setNumber(CardNumberEnum.ONE);
@@ -51,7 +51,7 @@ public class Test {
         e.setNumber(CardNumberEnum.FIVE);
 
         List<Card> cards = Arrays.asList(a, b, c, d, e);
-        System.out.println(JudgeType.isStraight(cards));*/
+        System.out.println(TypeJudgement.isStraight(cards));*/
 
         /*Card a = new Card();
         a.setNumber(CardNumberEnum.ONE);
@@ -67,7 +67,7 @@ public class Test {
         f.setNumber(CardNumberEnum.THREE);
 
         List<Card> cards = Arrays.asList(a, b, c, d, e, f);
-        System.out.println(JudgeType.isStraightPair(cards));*/
+        System.out.println(TypeJudgement.isStraightPair(cards));*/
 
         /*Card a = new Card();
         a.setGrade(CardGradeEnum.THIRD);
@@ -88,7 +88,7 @@ public class Test {
         h.setNumber(CardNumberEnum.EIGHT);
 
         List<Card> cards = Arrays.asList(a, b, c, d, e, f);
-        System.out.println(JudgeType.isFlyWithNone(cards));*/
+        System.out.println(TypeJudgement.isFlyWithNone(cards));*/
 
 
         Card a = new Card();
@@ -106,7 +106,7 @@ public class Test {
         f.setGrade(CardGradeEnum.SIXTH);
 
         List<Card> cards = Arrays.asList(a, b, c, d, e, f);
-        System.out.println(JudgeType.isFourWithTwo(cards));
+        System.out.println(TypeJudgement.isFourWithTwo(cards));
 
     }
 }

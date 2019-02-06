@@ -13,9 +13,9 @@ import java.util.List;
  * @author Pushy
  * @since 2018/12/29 15:09
  */
-public class CompareGrade {
+public class GradeComparison {
 
-    private static Logger logger = LoggerFactory.getLogger(CompareGrade.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(GradeComparison.class.getSimpleName());
 
     /**
      * 判断是否可以出牌，也就是当前玩家的牌是否比上家的大

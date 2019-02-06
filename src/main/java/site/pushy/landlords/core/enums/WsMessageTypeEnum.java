@@ -16,7 +16,9 @@ public enum WsMessageTypeEnum {
     BID_END("叫牌结束"),
 
     PLAY_CARD("有玩家出牌"),
-    PLEASE_PLAY_CARD("请出牌");
+    PLEASE_PLAY_CARD("请出牌"),
+
+    GAME_END("游戏结束");
 
     private String value;
 

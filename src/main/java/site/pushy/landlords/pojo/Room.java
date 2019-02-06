@@ -28,7 +28,11 @@ public class Room {
 
     private RoomStatusEnum status;    // 房间的状态
 
-    private List<WebSocketSession> userSessionList;  // 当家玩家客户端Session对象列表
+    private int multiple;             // 房间底分
+
+    private int stepNum;              // 每局走的步数
+
+    private List<Card> preCards;      // 上一回合玩家打出的牌
 
     private CardDistribution distribution;
 
@@ -41,12 +45,23 @@ public class Room {
         this.status = RoomStatusEnum.PREPARING;
         this.playerList = new ArrayList<>();
         this.userList = new ArrayList<>();
-        this.userSessionList = new ArrayList<>();
+        this.multiple = 1;
+        this.stepNum = 1;
     }
 
     public Room(String id) {
         this();
         this.id = id;
+    }
+
+    /**
+     * 每次每局结束之后，初始化Room对象的部分参数值
+     */
+    public void refresh() {
+        this.multiple = 1;
+        this.stepNum = 1;
+        this.status = RoomStatusEnum.PREPARING;
+        this.preCards = null;
     }
 
     public void addPlayer(Player player) {
@@ -57,6 +72,19 @@ public class Room {
         this.userList.add(user);
     }
 
+    /**
+     * 通过userId获取Player对象
+     */
+    public Player getPlayerByUserId(String userId) {
+        for (Player player : playerList) {
+            if (player.getUser().getId().equals(userId)) return player;
+        }
+        return null;
+    }
+
+    /**
+     * 通过玩家的序号获取对应的Player对象
+     */
     public Player getPlayerById(int playerId) {
         for (Player player : playerList) {
             if (player.getId() == playerId) return player;
@@ -64,6 +92,9 @@ public class Room {
         return null;
     }
 
+    /**
+     * 通过玩家序号获取关联的User对象
+     */
     public User getUserByPlayerId(int playerId) {
         Player player = getPlayerById(playerId);
         return player.getUser();

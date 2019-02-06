@@ -1,7 +1,9 @@
 package site.pushy.landlords.pojo.DTO;
 
 import lombok.Data;
+import lombok.NonNull;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -11,7 +13,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class BidDTO {
 
-    @NotNull
     private boolean want;
+
+    private int score;
 
 }

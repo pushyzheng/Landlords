@@ -10,12 +10,17 @@ import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
+import site.pushy.landlords.pojo.DTO.RoomOutputDTO;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.ws.Message;
 import site.pushy.landlords.pojo.ws.PlayerExitMessage;
 import site.pushy.landlords.pojo.ws.PlayerJoinMessage;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Fuxing
@@ -37,7 +42,14 @@ public class RoomController {
      */
     @GetMapping("")
     public String listRoom() {
-        return RespEntity.success(roomComponent.getRooms());
+        List<Room> roomList = roomComponent.getRooms();
+        if (roomList.size() != 0) {
+            List<RoomOutputDTO> dtoList = roomList.stream()
+                    .map(RoomOutputDTO::new)
+                    .collect(Collectors.toList());
+            return RespEntity.success(dtoList);
+        }
+        return RespEntity.success(roomList);
     }
 
     /**
@@ -103,16 +115,6 @@ public class RoomController {
         Message playerJoinMessage = new PlayerExitMessage(curUser);
         notifyComponent.sendToAllUserOfRoom(roomId, playerJoinMessage);
         return RespEntity.success(message);
-    }
-
-    /**
-     * 获取下家
-     */
-    @GetMapping("/next")
-    public String getNextPlayer(@Valid @RequestBody RoomDTO roomDTO,
-                                @SessionAttribute User curUser) {
-        String roomid = roomDTO.getId();
-        return RespEntity.success(roomComponent.getNextPlayer(roomid, curUser));
     }
 
 }

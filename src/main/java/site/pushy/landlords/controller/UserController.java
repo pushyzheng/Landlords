@@ -3,6 +3,7 @@ package site.pushy.landlords.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.NotFoundException;
+import site.pushy.landlords.common.util.JWTUtil;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;

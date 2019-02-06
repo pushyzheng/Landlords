@@ -148,15 +148,12 @@ public class RoomComponent {
         if (room == null){
             throw new NotFoundException("该房间不存在");
         }
-        // Todo 房间内其他玩家退出房间失败
         for (User user1 : room.getUserList()) {
             if (user1.getId().equals(user.getId())) {
                 room.getUserList().remove(user1);
                 break;
             }
         }
-
-
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
                 room.getPlayerList().remove(player);
@@ -199,32 +196,6 @@ public class RoomComponent {
             throw new NotFoundException("该房间不存在");
         }
         roomMap.put(id, newRoom);
-    }
-
-    /**
-     * 获得下个玩家
-     */
-    public Player getNextPlayer(String id, User user) {
-        Room room = roomMap.get(id);
-        Map<Integer, Player> playerIdMap = new HashMap<>();
-        for (Player player : room.getPlayerList()) {
-            playerIdMap.put(player.getId(), player);
-        }
-        for (Player player1 : room.getPlayerList()) {
-            if (player1.getUser().equals(user)) {
-                int playerId = player1.getId();
-                switch (playerId) {
-                    case 1:
-                        return playerIdMap.get(2);
-                    case 2:
-                        return playerIdMap.get(3);
-                    case 3:
-                        return playerIdMap.get(1);
-                }
-                break;
-            }
-        }
-        return null;
     }
 
     /**

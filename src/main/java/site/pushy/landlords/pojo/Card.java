@@ -60,7 +60,7 @@ public class Card implements Comparable<Card> {
     @Override
     public int compareTo(Card o) {
 //        return Integer.compare(this.getNumberValue(), o.getNumberValue());
-        return Integer.compare(this.getGradeValue(), o.getGradeValue());
+        return - Integer.compare(this.getGradeValue(), o.getGradeValue());
     }
 
     /**
