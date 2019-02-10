@@ -11,6 +11,18 @@ import java.util.List;
  */
 public interface PlayerService {
 
+    /**
+     * 获取某玩家当前手中的牌
+     */
     List<Card> getPlayerCards(User curUser);
 
+    /**
+     * 判断当前是否是某玩家的出牌回合
+     */
+    boolean isPlayerRound(User curUser);
+
+    /**
+     * 判断当前用户是否准备
+     */
+    boolean isPlayerReady(User curUser);
 }
