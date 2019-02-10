@@ -52,8 +52,15 @@ public class Player implements Comparable<Player> {
         Collections.sort(cards);
     }
 
+    public void reset() {
+        cards.clear();
+        ready = false;
+        identity = null;
+    }
+
     @Override
     public int compareTo(Player other) {
         return Integer.compare(id, other.id);
     }
+
 }

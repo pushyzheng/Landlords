@@ -95,11 +95,10 @@ public class Card implements Comparable<Card> {
 
     @Override
     public String toString() {
-        /*return "Card{" +
-                "type=" + type.getName() +
-                ", number=" + number.getValue() +
-                ", grade=" + grade +
-                "}";*/
-        return "" + number.getValue();
+        return "「" +
+                "类型=" + type.getName() +
+                ", 数值=" + number.getValue() +
+                ", 大小=" + grade +
+                "」";
     }
 }

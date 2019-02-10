@@ -170,13 +170,18 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void playCard(User user, List<Card> cardList) {
+    public boolean playCard(User user, List<Card> cardList) {
         Room room = roomComponent.getUserRoom(user.getId());
+        Player player = room.getPlayerByUserId(user.getId());
+        validRound(room, player);
+
+        /* 校验玩家出的牌是否符合斗地主规则规范 */
         TypeEnum myType = CardUtil.getCardType(cardList);
         if (myType == null) {
+            logger.info(String.format("玩家【%s】打出的牌不符合规则", user.getUsername()));
             throw new ForbiddenException("玩家打出的牌不符合规则");
         }
-        if (room.getPreCards() != null) {
+        if (room.getPreCards() != null && room.getPrePlayerId() != player.getId()) {
             /* 判断该玩家打出的牌是否能比上家出的牌大 */
             TypeEnum preType = CardUtil.getCardType(room.getPreCards());
             boolean canPlay = GradeComparison.canPlayCards(cardList, myType, room.getPreCards(), preType);
@@ -186,48 +191,53 @@ public class GameServiceImpl implements GameService {
                 throw new ForbiddenException("该玩家出的牌管不了上家");
             }
         }
-        for (Player player : room.getPlayerList()) {
-            if (player.getUser().getId().equals(user.getId())) {
-                int remainder = room.getStepNum() % 3;
-                if (remainder == 0) {
-                    if (player.getId() != 3) throw new ForbiddenException("当前不是该玩家出牌回合");
-                } else {
-                    if (player.getId() != remainder) throw new ForbiddenException("当前不是该玩家出牌回合");
-                }
-                // 移除玩家列表中打出的牌
-                player.removeCards(cardList);
-                Message message = new PlayCardMessage(user.getId(), cardList); // 有玩家出牌通知
-                notifyComponent.sendToAllUserOfRoom(room.getId(), message);
-                if (player.getCards().size() == 0) { // 判断该玩家已经出完牌
-                    logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
-                    room.refresh();
-                    // Todo 游戏结束，开始计分
-                    Message gameEndMessage = new GameEndMessage(player.getIdentity());  // 游戏结束通知
-                    notifyComponent.sendToAllUserOfRoom(room.getId(), gameEndMessage);
-                }
-                else {
-                    logger.info(String.format("玩家【%s】出牌，下一个出牌者序号为：%s", player.getUser().getUsername(),
-                            player.getNextPlayerId()));
-                    room.setPreCards(cardList);
-                    room.setStepNum(room.getStepNum() + 1);
-                    User nextUser = room.getUserByPlayerId(player.getNextPlayerId());  // 通知下一个玩家出牌
-                    notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
-                }
-                break;
-            }
+        // 移除玩家列表中打出的牌
+        player.removeCards(cardList);
+        Message message = new PlayCardMessage(user.getId(), cardList); // 有玩家出牌通知
+        notifyComponent.sendToAllUserOfRoom(room.getId(), message);
+
+        if (player.getCards().size() == 0) { // 判断该玩家已经出完牌
+            logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
+            room.reset();
+            Message gameEndMessage = new GameEndMessage(player.getIdentity());  // 游戏结束通知
+            notifyComponent.sendToAllUserOfRoom(room.getId(), gameEndMessage);
+        }
+        else {
+            logger.info(String.format("玩家【%s】出牌，类型为：【%s】，下一个出牌者序号为：%d", player.getUser().getUsername(),
+                    myType.getName(), player.getNextPlayerId()));
+            room.setPreCards(cardList);
+            room.setPrePlayerId(player.getId());
+            room.incrStep();
+            User nextUser = room.getUserByPlayerId(player.getNextPlayerId());  // 通知下一个玩家出牌
+            notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
         }
         roomComponent.updateRoom(room);
+        return player.getCards().size() == 0;
     }
 
     @Override
     public void pass(User user) {
         Room room = roomComponent.getUserRoom(user.getId());
         Player player = room.getPlayerByUserId(user.getId());
-        room.setStepNum(room.getStepNum() + 1);
+        validRound(room, player);
 
-        logger.info(String.format("玩家【%s】选择不出，下一个出牌者序号为：%d", user.getUsername(), player.getId()));
+        room.incrStep();
+        logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getId()));
 
         User nextUser = room.getUserByPlayerId(player.getNextPlayerId()); // 通过下一个玩家出牌
         notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
     }
+
+    /**
+     * 检验当前是不是该玩家出牌的回合
+     */
+    private void validRound(Room room, Player player) {
+        int remainder = room.getStepNum() % 3;
+        if (remainder == 0) {
+            if (player.getId() != 3) throw new ForbiddenException("当前不是该玩家出牌回合");
+        } else {
+            if (player.getId() != remainder) throw new ForbiddenException("当前不是该玩家出牌回合");
+        }
+    }
+
 }

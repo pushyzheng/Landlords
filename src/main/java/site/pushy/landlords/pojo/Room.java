@@ -34,6 +34,8 @@ public class Room {
 
     private List<Card> preCards;      // 上一回合玩家打出的牌
 
+    private int prePlayerId;          // 上一回合玩家的playerId
+
     private CardDistribution distribution;
 
     public String getStatusValue() {
@@ -57,11 +59,16 @@ public class Room {
     /**
      * 每次每局结束之后，初始化Room对象的部分参数值
      */
-    public void refresh() {
+    public void reset() {
         this.multiple = 1;
         this.stepNum = 1;
         this.status = RoomStatusEnum.PREPARING;
         this.preCards = null;
+        this.prePlayerId = 0;
+        // 初始化Player对象的值
+        for (Player player : playerList) {
+            player.reset();
+        }
     }
 
     public void addPlayer(Player player) {
@@ -70,6 +77,10 @@ public class Room {
 
     public void addUser(User user) {
         this.userList.add(user);
+    }
+
+    public void incrStep() {
+        stepNum++;
     }
 
     /**

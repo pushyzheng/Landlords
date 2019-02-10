@@ -12,6 +12,7 @@ import site.pushy.landlords.pojo.DTO.BidDTO;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.service.AchievementService;
 import site.pushy.landlords.service.GameService;
 import site.pushy.landlords.service.PlayerService;
 
@@ -32,6 +33,9 @@ public class GameController {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private AchievementService achievementService;
 
     /**
      * 准备
@@ -79,7 +83,7 @@ public class GameController {
     @PostMapping("/play")
     public String outCard(@SessionAttribute User curUser,
                           @RequestBody List<Card> cardList){
-        gameService.playCard(curUser,cardList);
+        boolean isEnd = gameService.playCard(curUser, cardList);
         return RespEntity.success("success");
     }
 

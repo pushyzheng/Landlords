@@ -35,7 +35,7 @@ public interface GameService {
     /**
      * 出牌
      */
-    void playCard(User user, List<Card> cardList);
+    boolean playCard(User user, List<Card> cardList);
 
     /**
      * 要不起

@@ -52,7 +52,8 @@ public class AuthController {
                 throw new UnauthorizedException("账号或密码错误");
             }
         }
-        return saveSession(request, user);
+        String token = saveSession(request, user);
+        return RespEntity.success(token);
     }
 
     /**
