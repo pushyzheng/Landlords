@@ -1,0 +1,4 @@
+server:
+  port: 8085
+
+frontend_callback_url: http://landlord.pushy.site/#/oauth/

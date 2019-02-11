@@ -18,6 +18,7 @@ import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.pojo.ws.*;
 import site.pushy.landlords.service.GameService;
 
@@ -64,10 +65,20 @@ public class GameServiceImpl implements GameService {
             }
         }
 
-        /* 通知其他房间的所有玩家准备游戏 */
-        Message readyGameMessage = new ReadyGameMessage(user.getId());
+        Message readyGameMessage = new ReadyGameMessage(user.getId());  // 玩家准备通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), readyGameMessage);
         return res;
+    }
+
+    @Override
+    public void unReadyGame(User curUser) {
+        Room room = roomComponent.getUserRoom(curUser.getId());
+        Player player = room.getPlayerByUserId(curUser.getId());
+        player.setReady(false);
+
+        roomComponent.updateRoom(room);
+        Message readyGameMessage = new UnReadyGameMessage(curUser.getId());  // 取消准备通知
+        notifyComponent.sendToAllUserOfRoom(room.getId(), readyGameMessage);
     }
 
     @Override
@@ -170,10 +181,10 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean playCard(User user, List<Card> cardList) {
+    public RoundResult playCard(User user, List<Card> cardList) {
+        System.out.println("【" + user.getUsername() + "】" + cardList);
         Room room = roomComponent.getUserRoom(user.getId());
         Player player = room.getPlayerByUserId(user.getId());
-        validRound(room, player);
 
         /* 校验玩家出的牌是否符合斗地主规则规范 */
         TypeEnum myType = CardUtil.getCardType(cardList);
@@ -196,11 +207,11 @@ public class GameServiceImpl implements GameService {
         Message message = new PlayCardMessage(user.getId(), cardList); // 有玩家出牌通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), message);
 
+        RoundResult result = null;
         if (player.getCards().size() == 0) { // 判断该玩家已经出完牌
             logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
+            result = getResult(room, player);
             room.reset();
-            Message gameEndMessage = new GameEndMessage(player.getIdentity());  // 游戏结束通知
-            notifyComponent.sendToAllUserOfRoom(room.getId(), gameEndMessage);
         }
         else {
             logger.info(String.format("玩家【%s】出牌，类型为：【%s】，下一个出牌者序号为：%d", player.getUser().getUsername(),
@@ -212,32 +223,30 @@ public class GameServiceImpl implements GameService {
             notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
         }
         roomComponent.updateRoom(room);
-        return player.getCards().size() == 0;
+        return result;
     }
 
     @Override
     public void pass(User user) {
         Room room = roomComponent.getUserRoom(user.getId());
         Player player = room.getPlayerByUserId(user.getId());
-        validRound(room, player);
 
         room.incrStep();
-        logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getId()));
+        roomComponent.updateRoom(room);
 
+        logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getNextPlayerId()));
         User nextUser = room.getUserByPlayerId(player.getNextPlayerId()); // 通过下一个玩家出牌
         notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
     }
 
-    /**
-     * 检验当前是不是该玩家出牌的回合
-     */
-    private void validRound(Room room, Player player) {
-        int remainder = room.getStepNum() % 3;
-        if (remainder == 0) {
-            if (player.getId() != 3) throw new ForbiddenException("当前不是该玩家出牌回合");
-        } else {
-            if (player.getId() != remainder) throw new ForbiddenException("当前不是该玩家出牌回合");
+    private RoundResult getResult(Room room, Player player) {
+        RoundResult result = new RoundResult(player.getIdentity(), room.getMultiple());
+        for (Player each : room.getPlayerList()) {
+            if (each.getIdentity() == IdentityEnum.LANDLORD) {
+                result.setLandlord(each.getId());
+            }
         }
+        return result;
     }
 
 }

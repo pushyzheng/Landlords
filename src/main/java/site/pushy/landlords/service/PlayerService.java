@@ -25,4 +25,9 @@ public interface PlayerService {
      * 判断当前用户是否准备
      */
     boolean isPlayerReady(User curUser);
+
+    /**
+     * 判断玩家是否可以不出
+     */
+    boolean canPass(User curUser);
 }

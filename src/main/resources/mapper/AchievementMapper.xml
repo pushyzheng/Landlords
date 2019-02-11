@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="site.pushy.landlords.dao.AchievementMapper">
   <resultMap id="BaseResultMap" type="site.pushy.landlords.pojo.DO.Achievement">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="win_match" jdbcType="INTEGER" property="winMatch" />
     <result column="failure_match" jdbcType="INTEGER" property="failureMatch" />
     <result column="sum" jdbcType="INTEGER" property="sum" />
@@ -83,15 +83,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from achievement
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from achievement
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="site.pushy.landlords.pojo.DO.AchievementExample">
     delete from achievement
@@ -102,7 +102,7 @@
   <insert id="insert" parameterType="site.pushy.landlords.pojo.DO.Achievement">
     insert into achievement (id, win_match, failure_match, 
       sum, user_id)
-    values (#{id,jdbcType=INTEGER}, #{winMatch,jdbcType=INTEGER}, #{failureMatch,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=VARCHAR}, #{winMatch,jdbcType=INTEGER}, #{failureMatch,jdbcType=INTEGER}, 
       #{sum,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="site.pushy.landlords.pojo.DO.Achievement">
@@ -126,7 +126,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=VARCHAR},
       </if>
       <if test="winMatch != null">
         #{winMatch,jdbcType=INTEGER},
@@ -152,7 +152,7 @@
     update achievement
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+        id = #{record.id,jdbcType=VARCHAR},
       </if>
       <if test="record.winMatch != null">
         win_match = #{record.winMatch,jdbcType=INTEGER},
@@ -173,7 +173,7 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update achievement
-    set id = #{record.id,jdbcType=INTEGER},
+    set id = #{record.id,jdbcType=VARCHAR},
       win_match = #{record.winMatch,jdbcType=INTEGER},
       failure_match = #{record.failureMatch,jdbcType=INTEGER},
       sum = #{record.sum,jdbcType=INTEGER},
@@ -198,7 +198,7 @@
         user_id = #{userId,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="site.pushy.landlords.pojo.DO.Achievement">
     update achievement
@@ -206,6 +206,6 @@
       failure_match = #{failureMatch,jdbcType=INTEGER},
       sum = #{sum,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

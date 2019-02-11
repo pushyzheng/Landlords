@@ -24,6 +24,13 @@ public class Player implements Comparable<Player> {
 
     private boolean ready;  // 玩家是否准备
 
+    public Player() {
+    }
+
+    public Player(Integer id) {
+        this.id = id;
+    }
+
     public String getIdentityName() {
         if (identity != null) {
             return identity.getName();

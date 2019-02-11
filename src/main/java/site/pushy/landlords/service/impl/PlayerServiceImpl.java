@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.core.component.RoomComponent;
+import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
@@ -34,9 +35,14 @@ public class PlayerServiceImpl implements PlayerService {
         if (room.getStatus() == RoomStatusEnum.PREPARING) {
             throw new BadRequestException("游戏还未开始");
         }
-        int prePlayerId = room.getPrePlayerId();
-        int next = prePlayerId == 3 ? 1 : prePlayerId + 1;
-        return room.getPlayerByUserId(curUser.getId()).getId() == next;
+        Player player = room.getPlayerByUserId(curUser.getId());
+        int remainder = room.getStepNum() % 3;
+        if (remainder == 0) {
+            if (player.getId() != 3) return false;
+        } else {
+            if (player.getId() != remainder) return false;
+        }
+        return true;
     }
 
     @Override
@@ -47,5 +53,18 @@ public class PlayerServiceImpl implements PlayerService {
         }
         Player player = room.getPlayerByUserId(curUser.getId());
         return player.isReady();
+    }
+
+    @Override
+    public boolean canPass(User curUser) {
+        Room room = roomComponent.getUserRoom(curUser.getId());
+        if (room.getStatus() == RoomStatusEnum.PREPARING) {
+            throw new BadRequestException("游戏还未开始");
+        }
+        Player player = room.getPlayerByUserId(curUser.getId());
+        if (room.getPrePlayerId() == 0) {
+            return player.getIdentity() != IdentityEnum.LANDLORD;
+        }
+        return room.getPrePlayerId() != player.getId();
     }
 }

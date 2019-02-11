@@ -1,5 +1,6 @@
 package site.pushy.landlords.pojo.ws;
 
+import lombok.Data;
 import site.pushy.landlords.core.enums.WsMessageTypeEnum;
 import site.pushy.landlords.pojo.Card;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * @author Pushy
  * @since 2019/2/3 19:26
  */
+@Data
 public class PlayCardMessage extends Message {
 
     private String userId;

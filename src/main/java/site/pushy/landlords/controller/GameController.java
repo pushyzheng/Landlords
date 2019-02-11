@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.pojo.Card;
@@ -12,6 +13,7 @@ import site.pushy.landlords.pojo.DTO.BidDTO;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
 import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.service.AchievementService;
 import site.pushy.landlords.service.GameService;
 import site.pushy.landlords.service.PlayerService;
@@ -51,12 +53,12 @@ public class GameController {
     }
 
     /**
-     * 玩家获取自己的牌
+     * 取消准备
      */
-    @GetMapping("/cards")
-    public String getCardsByPlayerId(@SessionAttribute User curUser) {
-        List<Card> cards = playerService.getPlayerCards(curUser);
-        return RespEntity.success(cards);
+    @PostMapping("/unReady")
+    public String unReadyGame(@SessionAttribute User curUser) {
+        gameService.unReadyGame(curUser);
+        return RespEntity.success("success");
     }
 
     /**
@@ -82,15 +84,27 @@ public class GameController {
      */
     @PostMapping("/play")
     public String outCard(@SessionAttribute User curUser,
-                          @RequestBody List<Card> cardList){
-        boolean isEnd = gameService.playCard(curUser, cardList);
+                          @RequestBody List<Card> cardList) {
+        validRound(curUser);
+        RoundResult result = gameService.playCard(curUser, cardList);
+        if (result != null) {
+            achievementService.countScore(curUser, result);
+        }
         return RespEntity.success("success");
     }
 
     @PostMapping("/pass")
     public String pass(@SessionAttribute User curUser) {
+        validRound(curUser);
         gameService.pass(curUser);
         return RespEntity.success("success");
+    }
+
+    private void validRound(User curUser) {
+        boolean result = playerService.isPlayerRound(curUser);
+        if (!result) {
+            throw new ForbiddenException("当前不是该玩家出牌回合");
+        }
     }
 
 }

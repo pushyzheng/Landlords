@@ -7,6 +7,7 @@ package site.pushy.landlords.core.enums;
 public enum WsMessageTypeEnum {
 
     READY_GAME("玩家准备"),
+    UNREADY_GAME("玩家取消准备"),
     START_GAME("开始游戏"),
 
     PLAYER_JOIN("有玩家加入"),

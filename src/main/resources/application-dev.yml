@@ -1,0 +1,4 @@
+server:
+  port: 80
+
+frontend_callback_url: http://localhost:9000/#/oauth/

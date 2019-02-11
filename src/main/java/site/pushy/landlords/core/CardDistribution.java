@@ -73,17 +73,17 @@ public class CardDistribution {
      */
     private void deal() {
         /* 分派给1号玩家17张牌 */
-        for (int i = 0; i < 17; i++) {
+        for (int i = 0; i < 1; i++) {
             Card card = allCardList.get(i * 3);
             player1Cards.add(card);
         }
         /* 分派给2号玩家17张牌 */
-        for (int i = 0; i < 17; i++) {
+        for (int i = 0; i < 1; i++) {
             Card card = allCardList.get(i * 3 + 1);
             player2Cards.add(card);
         }
         /* 分派给3号玩家17张牌 */
-        for (int i = 0; i < 17; i++) {
+        for (int i = 0; i < 1; i++) {
             Card card = allCardList.get(i * 3 + 2);
             player3Cards.add(card);
         }

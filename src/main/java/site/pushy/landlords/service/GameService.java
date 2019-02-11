@@ -2,6 +2,9 @@ package site.pushy.landlords.service;
 
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.Player;
+import site.pushy.landlords.pojo.Room;
+import site.pushy.landlords.pojo.RoundResult;
 
 import java.util.List;
 
@@ -16,6 +19,11 @@ public interface GameService {
      * @return 是否开局，当房间的内的所有玩家都准备，并且人数已满3人，即为开局
      */
     boolean readyGame(User user);
+
+    /**
+     * 取消准备
+     */
+    void unReadyGame(User curUser);
 
     /**
      * 通知所有房间内的玩家开始游戏，并更新房间的状态
@@ -35,7 +43,7 @@ public interface GameService {
     /**
      * 出牌
      */
-    boolean playCard(User user, List<Card> cardList);
+    RoundResult playCard(User user, List<Card> cardList);
 
     /**
      * 要不起

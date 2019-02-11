@@ -8,6 +8,7 @@ import com.qq.connect.oauth.Oauth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
@@ -33,7 +34,9 @@ import java.util.List;
 public class AuthController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String FRONT_END_CALLBACK_URL = "http://localhost:9000/#/oauth/";
+
+    @Value("${frontend_callback_url}")
+    private String FRONTEND_CALLBACK_URL;
 
     @Autowired
     private UserMapper userMapper;
@@ -79,7 +82,7 @@ public class AuthController {
             AccessToken accessTokenObj = new Oauth().getAccessTokenByRequest(request);
             String accessToken;
             if (accessTokenObj.getAccessToken().equals("")) {
-                throw new BadRequestException("没有获取到响应参数");
+                throw new BadRequestException("没有获取到QQ第三方平台的响应参数");
             }
             accessToken = accessTokenObj.getAccessToken();
             String openid = new OpenID(accessToken).getUserOpenID();
@@ -89,14 +92,14 @@ public class AuthController {
                 UserInfoBean userInfo = new UserInfo(accessToken, openid).getUserInfo();
                 logger.info("用户【" + userInfo.getNickname() + "】 通过第三方登录，openId => " + openid);
                 if (userInfo == null) {
-                    throw new BadRequestException("没有获取到响应参数");
+                    throw new BadRequestException("没有获取到QQ第三方平台的响应参数");
                 }
                 user = new User(userInfo.getNickname(), "", openid, userInfo.getAvatar().getAvatarURL100());
                 user.setGender(userInfo.getGender());
                 userMapper.insert(user);
             }
             String token = saveSession(request, user);
-            response.sendRedirect(FRONT_END_CALLBACK_URL + token);
+            response.sendRedirect(FRONTEND_CALLBACK_URL + token);
         } catch (Exception e) {
             qqLogin(request, response);
         }
@@ -127,7 +130,7 @@ public class AuthController {
         return users.isEmpty() ? null : users.get(0);
     }
 
-    public User getUserByOpenId(String openid) {
+    private User getUserByOpenId(String openid) {
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
         criteria.andOpenidEqualTo(openid);

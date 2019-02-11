@@ -49,6 +49,7 @@ public class Room {
         this.userList = new ArrayList<>();
         this.multiple = 1;
         this.stepNum = 1;
+        this.prePlayerId = 0;
     }
 
     public Room(String id) {

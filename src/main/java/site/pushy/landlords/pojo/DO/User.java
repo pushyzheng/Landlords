@@ -48,6 +48,14 @@ public class User {
         this.avatar = avatar;
     }
 
+    public void incrMoney(int value) {
+        money += value;
+    }
+
+    public void descMoney(int value) {
+        money -= value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
