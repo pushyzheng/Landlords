@@ -30,7 +30,7 @@ public class Room {
 
     private int multiple;             // 房间底分
 
-    private int stepNum;              // 每局走的步数
+    private int stepNum;              // 每局走的步数，用来控制玩家的出牌回合
 
     private List<Card> preCards;      // 上一回合玩家打出的牌
 
@@ -82,6 +82,10 @@ public class Room {
 
     public void incrStep() {
         stepNum++;
+    }
+
+    public void doubleMultiple() {
+        multiple *= 2;
     }
 
     /**

@@ -1,5 +1,8 @@
 package site.pushy.landlords.core.enums;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 牌的等级枚举值
  *
@@ -37,6 +40,10 @@ public enum CardGradeEnum {
 
     public int getValue() {
         return value;
+    }
+
+    public static List<CardGradeEnum> getIllegalGradeOfStraight() {
+        return Arrays.asList(THIRTEENTH, FOURTEENTH, FIFTEENTH);
     }
 
 

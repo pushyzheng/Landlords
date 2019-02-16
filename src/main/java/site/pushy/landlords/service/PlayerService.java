@@ -30,4 +30,5 @@ public interface PlayerService {
      * 判断玩家是否可以不出
      */
     boolean canPass(User curUser);
+
 }

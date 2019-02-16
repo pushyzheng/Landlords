@@ -55,6 +55,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
             session.close();
         }
         String userId = (String) session.getAttributes().get("userId");
+        logger.info(String.format("玩家【%s】断开了连接！", userId));
         userMap.remove(userId);
     }
 
@@ -72,7 +73,10 @@ public class WebSocketPushHandler implements WebSocketHandler {
 
         for (Map.Entry<String,WebSocketSession> entry : userMap.entrySet()) {
             WebSocketSession session = entry.getValue();
-            if (session.isOpen()) {
+            if (!session.isOpen()) {
+                logger.error("玩家不在线");
+            }
+            else {
                 try {
                     session.sendMessage(message);
                 } catch (IOException e) {

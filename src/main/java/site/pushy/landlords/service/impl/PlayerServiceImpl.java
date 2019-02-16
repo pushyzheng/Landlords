@@ -67,4 +67,5 @@ public class PlayerServiceImpl implements PlayerService {
         }
         return room.getPrePlayerId() != player.getId();
     }
+
 }

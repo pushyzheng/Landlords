@@ -32,13 +32,12 @@ public class RoomComponent {
      */
     public Room createRoom(User user, String roomPassword) {
         if (getUserRoomId(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId() + " 的房间"));
         }
         String roomId = newRoomid();
         Room room = new Room(roomId);
-        Player player = new Player();
+        Player player = new Player(1);  // //创建房间的人座位顺序为1
         player.setUser(user);
-        player.setId(1);  //创建房间的人座位顺序为1
         room.addUser(user);
         room.addPlayer(player);
 
@@ -160,9 +159,6 @@ public class RoomComponent {
                 break;
             }
         }
-        System.out.println("退出房间成功");
-        System.out.println(room.getUserList());
-        System.out.println(room.getPlayerList());
         int roomSize = room.getPlayerList().size();
         //检查房间内剩余人数是否为0,为0则解散
         if (roomSize == 0) {

@@ -2,10 +2,7 @@ package site.pushy.landlords.core;
 
 import site.pushy.landlords.pojo.Card;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 每局开始重新发牌、分牌、获取每个玩家的牌、分配玩家身份。
@@ -17,20 +14,20 @@ public class CardDistribution {
 
     private List<Card> allCardList;  // 所有牌
 
-    private List<Card> player1Cards = new ArrayList<>();  // 玩家1的牌
-    private List<Card> player2Cards = new ArrayList<>();  // 玩家2的牌
-    private List<Card> player3Cards = new ArrayList<>();  // 玩家3的牌
+    private List<Card> player1Cards = new Vector<>();  // 玩家1的牌
+    private List<Card> player2Cards = new Vector<>();  // 玩家2的牌
+    private List<Card> player3Cards = new Vector<>();  // 玩家3的牌
 
-    private List<Card> topCards = new ArrayList<>();
+    private List<Card> topCards = new Vector<>();
 
     public CardDistribution() {
-        allCardList = new LinkedList<>();
+        allCardList = new Vector<>();
     }
 
     /**
      * 刷新牌，重新洗牌，分牌
      */
-    public void refresh() {
+    public synchronized void refresh() {
         clear();
         createCard();
         shuffle();
@@ -51,7 +48,7 @@ public class CardDistribution {
         }
     }
 
-    private void clear() {
+    private synchronized void clear() {
         allCardList.clear();
         player1Cards.clear();
         player2Cards.clear();
@@ -73,23 +70,23 @@ public class CardDistribution {
      */
     private void deal() {
         /* 分派给1号玩家17张牌 */
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 17; i++) {
             Card card = allCardList.get(i * 3);
             player1Cards.add(card);
         }
         /* 分派给2号玩家17张牌 */
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 17; i++) {
             Card card = allCardList.get(i * 3 + 1);
             player2Cards.add(card);
         }
         /* 分派给3号玩家17张牌 */
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 17; i++) {
             Card card = allCardList.get(i * 3 + 2);
             player3Cards.add(card);
         }
 
         /* 将剩余的三张牌添加到地主的牌当中 */
-        topCards = allCardList.subList(51, 53);
+        topCards = allCardList.subList(51, 54);
 
         /* 将玩家的牌通过等级由小到大的排序 */
         Collections.sort(player1Cards);

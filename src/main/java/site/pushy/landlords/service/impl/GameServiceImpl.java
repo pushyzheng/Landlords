@@ -87,11 +87,8 @@ public class GameServiceImpl implements GameService {
         room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
 
         /* 构造 CardDistribution类，进行发牌 */
+        room.setDistribution(new CardDistribution());
         CardDistribution distribution = room.getDistribution();
-        if (distribution == null) {
-            distribution = new CardDistribution();
-            room.setDistribution(distribution);
-        }
         distribution.refresh();  // 洗牌
 
         List<Player> playerList = room.getPlayerList();
@@ -204,9 +201,12 @@ public class GameServiceImpl implements GameService {
         }
         // 移除玩家列表中打出的牌
         player.removeCards(cardList);
-        Message message = new PlayCardMessage(user.getId(), cardList); // 有玩家出牌通知
+        Message message = new PlayCardMessage(user, cardList); // 有玩家出牌通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), message);
-
+        // 判断出的牌是否是炸弹或者王炸，如果是，则底分加倍
+        if (myType == TypeEnum.BOMB || myType == TypeEnum.JOKER_BOMB) {
+            room.doubleMultiple();
+        }
         RoundResult result = null;
         if (player.getCards().size() == 0) { // 判断该玩家已经出完牌
             logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));

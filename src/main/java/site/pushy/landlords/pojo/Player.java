@@ -4,6 +4,7 @@ import lombok.Data;
 import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.pojo.DO.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,9 +26,12 @@ public class Player implements Comparable<Player> {
     private boolean ready;  // 玩家是否准备
 
     public Player() {
+        cards = new ArrayList<>();
+        ready = false;
     }
 
     public Player(Integer id) {
+        this();
         this.id = id;
     }
 

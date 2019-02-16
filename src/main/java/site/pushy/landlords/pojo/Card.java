@@ -28,6 +28,10 @@ public class Card implements Comparable<Card> {
 
     public Card() { }
 
+    public Card(CardGradeEnum grade) {
+        this.grade = grade;
+    }
+
     public Card(int id) {
         this.id = id;
     }
@@ -71,6 +75,12 @@ public class Card implements Comparable<Card> {
         return Integer.compare(this.getGradeValue(), o.getGradeValue());
     }
 
+    public boolean equalsByGrade(Card other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        return this.getGradeValue() == other.getGradeValue();
+    }
+
     /**
      * 实现两张牌是否相等
      * @param o 另一张对比的牌
@@ -96,8 +106,9 @@ public class Card implements Comparable<Card> {
     @Override
     public String toString() {
         return "（" +
-                "类型=" + type.getName() +
-                ", 数值=" + number.getValue() +
+                "类型=" + getTypeName() +
+                ", 数值=" + getNumberValue() +
+                ", 等级=" + getGradeValue() +
                 "）";
     }
 }

@@ -1,6 +1,8 @@
 package site.pushy.landlords.service;
 
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.DTO.RoomDTO;
+import site.pushy.landlords.pojo.DTO.RoomOutDTO;
 import site.pushy.landlords.pojo.Room;
 
 /**
@@ -9,10 +11,12 @@ import site.pushy.landlords.pojo.Room;
  */
 public interface RoomService {
 
-    Room createRoom(User user);
+    RoomOutDTO getRoomById(User curUser, String id);
 
-    boolean joinRoom(String id, User user);
+    Room createRoom(User curUser, String password);
 
-    boolean exitRoom(String id, User user);
+    String joinRoom(User curUser, RoomDTO roomDTO);
+
+    String exitRoom(User curUser);
 
 }

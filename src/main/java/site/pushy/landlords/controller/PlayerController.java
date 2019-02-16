@@ -50,4 +50,5 @@ public class PlayerController {
     public String canPass(@SessionAttribute User curUser) {
         return RespEntity.success(playerService.canPass(curUser));
     }
+
 }
