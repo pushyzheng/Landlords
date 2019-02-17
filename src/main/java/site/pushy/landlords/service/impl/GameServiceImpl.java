@@ -199,6 +199,7 @@ public class GameServiceImpl implements GameService {
                 throw new ForbiddenException("该玩家出的牌管不了上家");
             }
         }
+        player.setRecentCards(cardList);
         // 移除玩家列表中打出的牌
         player.removeCards(cardList);
         Message message = new PlayCardMessage(user, cardList); // 有玩家出牌通知

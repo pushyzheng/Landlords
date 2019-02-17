@@ -19,7 +19,9 @@ public enum WsMessageTypeEnum {
     PLAY_CARD("有玩家出牌"),
     PLEASE_PLAY_CARD("请出牌"),
 
-    GAME_END("游戏结束");
+    GAME_END("游戏结束"),
+
+    PONG("心跳检测");
 
     private String value;
 

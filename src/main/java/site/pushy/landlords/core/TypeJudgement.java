@@ -98,6 +98,20 @@ public class TypeJudgement {
     }
 
     /**
+     * 判断是否是三带一对
+     */
+    public static boolean isTreeWithPair(List<Card> cards) {
+        if (isEmpty(cards) || cards.size() != 5) return false;
+        cards.sort(new CardSortComparable());
+        if (cards.get(0).equalsByGrade(cards.get(1)) && cards.get(0).equalsByGrade(cards.get(2)))
+            return cards.get(3).equalsByGrade(cards.get(4));
+        else if (cards.get(3).equalsByGrade(cards.get(1)) && cards.get(3).equalsByGrade(cards.get(2)))
+            return cards.get(0).equalsByGrade(cards.get(0));
+        else
+            return false;
+    }
+
+    /**
      * 判断是否出的牌是四带二
      */
     public static boolean isFourWithTwo(List<Card> cards)  {

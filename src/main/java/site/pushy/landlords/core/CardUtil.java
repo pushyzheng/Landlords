@@ -48,6 +48,8 @@ public class CardUtil {
                 type = TypeEnum.THREE;
             } else if (TypeJudgement.isThreeWithOne(cards)) {
                 type = TypeEnum.THREE_WITH_ONE;
+            } else if (TypeJudgement.isTreeWithPair(cards)) {
+                type = TypeEnum.THREE_WITH_PAIR;
             } else if (TypeJudgement.isStraight(cards)) {
                 type = TypeEnum.STRAIGHT;
             } else if (TypeJudgement.isStraightPair(cards)) {

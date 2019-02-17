@@ -67,13 +67,13 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public String exitRoom(User curUser) {
+    public void exitRoom(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        String message = roomComponent.exitRoom(room.getId(), curUser);
-
-        /* 通知房间内的玩家客户端有玩家退出 */
-        Message playerJoinMessage = new PlayerExitMessage(curUser);
-        notifyComponent.sendToAllUserOfRoom(room.getId(), playerJoinMessage);
-        return message;
+        boolean hasRemove = roomComponent.exitRoom(room.getId(), curUser);
+        if (!hasRemove) {
+            /* 通知房间内的玩家客户端有玩家退出 */
+            Message playerJoinMessage = new PlayerExitMessage(curUser);
+            notifyComponent.sendToAllUserOfRoom(room.getId(), playerJoinMessage);
+        }
     }
 }

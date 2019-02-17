@@ -78,7 +78,8 @@ public class RoomController {
      */
     @PostMapping("/exit")
     public String exitRoom(@SessionAttribute User curUser) {
-        return RespEntity.success(roomService.exitRoom(curUser));
+        roomService.exitRoom(curUser);
+        return RespEntity.success("success");
     }
 
 }

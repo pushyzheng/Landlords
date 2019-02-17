@@ -1,9 +1,11 @@
 package site.pushy.landlords.common.handler;
 
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
+import site.pushy.landlords.pojo.DTO.PongMessage;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,10 +35,16 @@ public class WebSocketPushHandler implements WebSocketHandler {
         userMap.put(userId, session);
     }
 
+    /**
+     * 处理客户端通过webSocket.send()发送的消息，这里用来处理心跳检测
+     */
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> message) throws Exception {
-        TextMessage msg = (TextMessage)message.getPayload();
-        logger.info("收到客户端消息 => " + msg);
+        String payload = (String) message.getPayload();
+        if (payload.equals("ping")) {
+            String respContent = JSON.toJSONString(new PongMessage());
+            webSocketSession.sendMessage(new TextMessage(respContent));
+        }
     }
 
     @Override
@@ -55,7 +63,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
             session.close();
         }
         String userId = (String) session.getAttributes().get("userId");
-        logger.info(String.format("玩家【%s】断开了连接！", userId));
+        logger.info(String.format("Client 【%s】 closed webSocket connection", userId));
         userMap.remove(userId);
     }
 

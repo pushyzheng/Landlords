@@ -15,18 +15,21 @@ import java.util.List;
 @Data
 public class Player implements Comparable<Player> {
 
-    private Integer id;  // 玩家在当前房间的座位顺序
+    private Integer id;             // 玩家在当前房间的座位顺序
 
     private IdentityEnum identity;  // 当前局的身份（地主、农民）
 
-    private List<Card> cards;  // 玩家当前手中的牌
+    private List<Card> cards;       // 玩家当前手中的牌
 
-    private User user;  // 玩家的用户对象
+    private List<Card> recentCards; // 玩家最近出的牌列表
 
-    private boolean ready;  // 玩家是否准备
+    private User user;              // 玩家的用户对象
+
+    private boolean ready;          // 玩家是否准备
 
     public Player() {
         cards = new ArrayList<>();
+        recentCards = new ArrayList<>();
         ready = false;
     }
 
@@ -63,10 +66,14 @@ public class Player implements Comparable<Player> {
         Collections.sort(cards);
     }
 
+    /**
+     * 开局重置Player对象中的值
+     */
     public void reset() {
         cards.clear();
         ready = false;
         identity = null;
+        recentCards.clear();
     }
 
     @Override

@@ -76,8 +76,26 @@ public class Room {
         this.playerList.add(player);
     }
 
+    public void removePlayer(String userId) {
+        for (Player player : playerList) {
+            if (player.getUser().getId().equals(userId)) {
+                playerList.remove(player);
+                break;
+            }
+        }
+    }
+
     public void addUser(User user) {
         this.userList.add(user);
+    }
+
+    public void removeUser(String userId) {
+        for (User user : userList) {
+            if (user.getId().equals(userId)) {
+                userList.remove(user);
+                break;
+            }
+        }
     }
 
     public void incrStep() {
