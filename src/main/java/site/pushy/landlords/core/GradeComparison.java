@@ -60,30 +60,26 @@ public class GradeComparison {
             prevCard = prevCards.get(1);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
+        /* 3带一对，只需要比较第三张牌即可 */
+        else if (prevType ==TypeEnum.THREE_WITH_PAIR) {
+            myCard = myCards.get(2);
+            prevCard = prevCards.get(2);
+            return CardUtil.compareGradeTo(myCard, prevCard);
+        }
         /* 4带2，只需要比较第三张牌大小的等级 */
         else if (prevType == TypeEnum.FOUR_WITH_TWO) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
             return CardUtil.compareGradeTo(myCard, prevCard);
         }
-        /* 顺子，只需要比较最大的一张牌的大小 */
-        else if (prevType == TypeEnum.STRAIGHT) {
+        /* 顺子、连对一样，只需要比较最大的一张牌的大小 */
+        else if (prevType == TypeEnum.STRAIGHT || prevType == TypeEnum.STRAIGHT_PAIR) {
             if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
                 return false;
             }
             myCard = myCards.get(mySize - 1);
             prevCard = prevCards.get(prevSize - 1);
             return CardUtil.compareGradeTo(myCard, prevCard);
-        }
-        /* 连对，和顺子一样，只需要比较最大的一张牌的大小 */
-        else if (prevType == TypeEnum.STRAIGHT_PAIR) {
-            if (mySize != prevSize) {
-                return false;
-            } else {
-                myCard = myCards.get(mySize - 1);
-                prevCard = prevCards.get(prevSize - 1);
-                return CardUtil.compareGradeTo(myCard, prevCard);
-            }
         }
         /* 飞机 */
         else if (prevType == TypeEnum.AIRCRAFT) {
@@ -96,7 +92,7 @@ public class GradeComparison {
                 return CardUtil.compareGradeTo(myCard, prevCard);
             }
         }
-        /* 单张、对子、三张、炸弹等情况，都是只需要判断第一章牌大小即可 */
+        /* 单张、对子、三张、炸弹等情况，都是只需要判断第一张牌大小即可 */
         else {
             return CardUtil.compareGradeTo(myCard, prevCard);
         }

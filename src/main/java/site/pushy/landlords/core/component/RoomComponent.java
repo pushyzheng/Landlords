@@ -30,12 +30,13 @@ public class RoomComponent {
      * @param user
      * @return
      */
-    public Room createRoom(User user, String roomPassword) {
+    public Room createRoom(User user, String roomPassword, String title) {
         if (getUserRoomId(user.getId()) != null) {
             throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId() + " 的房间"));
         }
         String roomId = newRoomid();
         Room room = new Room(roomId);
+        room.setTitle(title);
         Player player = new Player(1);  // //创建房间的人座位顺序为1
         player.setUser(user);
         room.addUser(user);
@@ -67,22 +68,22 @@ public class RoomComponent {
         //检查房间是否存在
         if (room == null) {
             //房间不存在,返回消息
-            throw new NotFoundException("该房间不存在,请核实您输入的房间号!");
+            throw new NotFoundException("该房间不存在，请核实您输入的房间号!");
         } else {
             //判断用户是否已经在房间内
             if (room.getUserList().contains(user)) {
-                throw new ForbiddenException("您已经加入此房间,无法重复加入");
+                throw new ForbiddenException("您已经加入此房间，无法重复加入");
             } else {
                 //检查房间中人数是否小于三人
                 int roomsize = room.getPlayerList().size();
                 if (roomsize >= 3) {
                     //房间人数大于三人不能加入,返回消息
-                    throw new ForbiddenException("该房间已满,请寻找其他房间!");
+                    throw new ForbiddenException("该房间已满，请寻找其他房间!");
                 } else {
                     //房间人数小于三人可以加入
                     if (room.isLocked()) {
                         if (roomPassword == null)
-                            throw new ForbiddenException("对不起,您输入的房间密码有误!");
+                            throw new ForbiddenException("对不起，您输入的房间密码有误!");
                         //有密码
                         if (roomPassword.equals(room.getPassword())) {
                             //分配座位顺序
@@ -117,7 +118,7 @@ public class RoomComponent {
 
                         } else {
                             //密码错误,返回消息
-                            throw new ForbiddenException("对不起,您输入的房间密码有误!");
+                            throw new ForbiddenException("对不起，您输入的房间密码有误!");
                         }
 
                     } else {

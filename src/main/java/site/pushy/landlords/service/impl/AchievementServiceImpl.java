@@ -45,11 +45,12 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     public void countScore(User curUser, RoundResult result) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        GameEndMessage gameEndMessage = new GameEndMessage();
         List<Map<String, Integer>> resList = new ArrayList<>();
+        List<GameEndMessage> messages = new ArrayList<>();
         int multiple = result.getMultiple();
 
         for (User user : room.getUserList()) {
+            GameEndMessage gameEndMessage = new GameEndMessage();
             Map<String, Integer> map = new HashMap<>();
             boolean isWinning = false;
             Player player = room.getPlayerByUserId(user.getId());
@@ -78,12 +79,20 @@ public class AchievementServiceImpl implements AchievementService {
                 gameEndMessage.setWiningIdentity(FARMER);
             }
             resList.add(map);
+            // 游戏结束——计分消息通知
+            gameEndMessage.setWinning(isWinning);
+            messages.add(gameEndMessage);
+
             userMapper.updateByPrimaryKeySelective(user);
             updateAchievement(user.getId(), isWinning);   // 更新战绩
         }
-        // 游戏结束——计分消息通知
-        gameEndMessage.setResList(resList);
-        notifyComponent.sendToAllUserOfRoom(room.getId(), gameEndMessage);
+
+        // 通知各个玩家
+        for (int i = 0; i < room.getUserList().size(); i++) {
+            GameEndMessage message = messages.get(i);
+            message.setResList(resList);
+            notifyComponent.sendToUser(room.getUserList().get(i).getId(), message);
+        }
     }
 
     @Override

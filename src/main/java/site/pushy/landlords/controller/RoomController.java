@@ -61,7 +61,8 @@ public class RoomController {
     @PostMapping("")
     public String createRoom(@SessionAttribute User curUser,
                              @RequestBody JSONObject body) {
-        return RespEntity.success(roomService.createRoom(curUser, body.getString("password")));
+        return RespEntity.success(roomService.createRoom(curUser, body.getString("password"),
+                body.getString("title")));
     }
 
     /**

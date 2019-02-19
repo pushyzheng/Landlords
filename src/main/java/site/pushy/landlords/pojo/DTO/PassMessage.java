@@ -2,26 +2,24 @@ package site.pushy.landlords.pojo.DTO;
 
 import lombok.Data;
 import site.pushy.landlords.core.enums.WsMessageTypeEnum;
+import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.ws.Message;
-
-import java.util.Date;
 
 /**
  * @author Pushy
- * @since 2019/2/17 19:17
+ * @since 2019/2/18 22:03
  */
 @Data
-public class PongMessage extends Message {
+public class PassMessage extends Message {
 
-    private Date timeStamp;
+    private User user;
 
-    public PongMessage() {
-        this.timeStamp = new Date();
+    public PassMessage(User user) {
+        this.user = user;
     }
 
     @Override
     public WsMessageTypeEnum getType() {
-        return WsMessageTypeEnum.PONG;
+        return WsMessageTypeEnum.PASS;
     }
-
 }

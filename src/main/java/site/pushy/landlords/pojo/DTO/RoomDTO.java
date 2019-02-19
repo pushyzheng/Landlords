@@ -8,8 +8,10 @@ import javax.validation.constraints.NotNull;
 public class RoomDTO {
 
     @NotNull
-    private String id;  // 房间号
+    private String id;        // 房间号
 
     private String password;  // 房间密码
+
+    private String title;     // 房间标题
 
 }

@@ -16,6 +16,8 @@ public class GameEndMessage extends Message {
 
     private IdentityEnum winingIdentity;  // 胜利方的身份
 
+    private boolean winning;            // 该玩家是否胜利
+
     private List<Map<String, Integer>> resList;
 
     public String getWiningIdentityName() {

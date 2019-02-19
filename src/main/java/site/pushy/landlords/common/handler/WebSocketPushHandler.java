@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
-import site.pushy.landlords.pojo.DTO.PongMessage;
+import site.pushy.landlords.pojo.ws.PongMessage;
 
 import java.io.IOException;
 import java.util.List;
@@ -63,7 +63,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
             session.close();
         }
         String userId = (String) session.getAttributes().get("userId");
-        logger.info(String.format("Client 【%s】 closed webSocket connection", userId));
+        //logger.info(String.format("Client 【%s】 closed webSocket connection", userId));
         userMap.remove(userId);
     }
 

@@ -1,18 +1,15 @@
 package site.pushy.landlords.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.common.util.RespEntity;
-import site.pushy.landlords.core.component.RoomComponent;
+import site.pushy.landlords.core.CardUtil;
+import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.BidDTO;
 import site.pushy.landlords.pojo.DTO.ReadyGameDTO;
-import site.pushy.landlords.pojo.DTO.RoomDTO;
-import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.service.AchievementService;
 import site.pushy.landlords.service.GameService;
@@ -20,7 +17,6 @@ import site.pushy.landlords.service.PlayerService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Pushy
@@ -90,7 +86,7 @@ public class GameController {
         if (result != null) {
             achievementService.countScore(curUser, result);
         }
-        return RespEntity.success("success");
+        return RespEntity.success(result == null ? "success" : result);
     }
 
     @PostMapping("/pass")

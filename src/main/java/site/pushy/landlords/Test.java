@@ -38,6 +38,17 @@ public class Test {
 //        List<Card> cards = Arrays.asList(a, b, c, d);
 //        System.out.println(TypeJudgement.isThreeWithOne(cards));
 
+
+//         3带1对
+//        Card a = new Card(SECOND);
+//        Card b = new Card(SECOND);
+//        Card c = new Card(SECOND);
+//        Card d = new Card(FIRST);
+//        Card e = new Card(SEVENTH);
+//
+//        List<Card> cards = Arrays.asList(a, b, c, d, e);
+//        System.out.println(TypeJudgement.isThreeWithPair(cards));
+
 //        顺子
 //        Card a = new Card(EIGHTH);
 //        Card b = new Card(NINTH);

@@ -20,6 +20,8 @@ public class Room {
 
     private String password;          // 房间密码
 
+    private String title;             // 房间标题
+
     private boolean locked;           // 房间是否设置密码,true为设置
 
     private List<Player> playerList;  // 当前玩家列表

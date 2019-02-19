@@ -16,6 +16,7 @@ import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.DTO.PassMessage;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
@@ -202,7 +203,7 @@ public class GameServiceImpl implements GameService {
         player.setRecentCards(cardList);
         // 移除玩家列表中打出的牌
         player.removeCards(cardList);
-        Message message = new PlayCardMessage(user, cardList); // 有玩家出牌通知
+        Message message = new PlayCardMessage(user, cardList, myType); // 有玩家出牌通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), message);
         // 判断出的牌是否是炸弹或者王炸，如果是，则底分加倍
         if (myType == TypeEnum.BOMB || myType == TypeEnum.JOKER_BOMB) {
@@ -238,6 +239,7 @@ public class GameServiceImpl implements GameService {
         logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getNextPlayerId()));
         User nextUser = room.getUserByPlayerId(player.getNextPlayerId()); // 通过下一个玩家出牌
         notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
+        notifyComponent.sendToAllUserOfRoom(room.getId(), new PassMessage(user));
     }
 
     private RoundResult getResult(Room room, Player player) {
