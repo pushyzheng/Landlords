@@ -8,6 +8,7 @@ import site.pushy.landlords.core.enums.WsMessageTypeEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public class PlayCardMessage extends Message {
 
     public PlayCardMessage(User user, List<Card> cardList, TypeEnum cardType) {
         this.user = user;
+        Collections.sort(cardList);
         this.cardList = cardList;
         this.cardType = cardType;
         if (cardType == TypeEnum.SINGLE || cardType == TypeEnum.PAIR) {

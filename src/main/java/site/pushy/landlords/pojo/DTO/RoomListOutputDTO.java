@@ -17,6 +17,10 @@ public class RoomListOutputDTO {
 
     private String id;                // 房间号
 
+    private String title;
+
+    private UserOutDTO owner;
+
     private boolean locked;           // 房间是否设置密码,true为设置
 
     private List<UserOutDTO> userList;      // 当前用户列表
@@ -25,6 +29,8 @@ public class RoomListOutputDTO {
 
     public RoomListOutputDTO(Room room) {
         id = room.getId();
+        title = room.getTitle();
+        owner = new UserOutDTO(room.getOwner());
         locked = room.isLocked();
         userList = room.getUserList().stream()
                 .map(UserOutDTO::new)

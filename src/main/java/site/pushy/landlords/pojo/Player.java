@@ -66,6 +66,10 @@ public class Player implements Comparable<Player> {
         Collections.sort(cards);
     }
 
+    public void clearRecentCards() {
+        recentCards.clear();
+    }
+
     /**
      * 开局重置Player对象中的值
      */

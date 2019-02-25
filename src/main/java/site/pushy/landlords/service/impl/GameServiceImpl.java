@@ -96,14 +96,14 @@ public class GameServiceImpl implements GameService {
         for (Player player : playerList) {
             List<Card> cards = distribution.getCards(player.getId());
             player.setCards(cards);
+            player.setReady(false);
         }
-
-        roomComponent.updateRoom(room);
         /* 通知房间内所有的玩家客户端开始游戏 */
         notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
 
         /* 在分牌之后随机分牌一个玩家进行叫地主 */
         int order = (int) (1 + Math.random() * (3 - 1 + 1));  //从1到3的int型随机数
+        room.setBiddingPlayer(order);
         for (Player player : room.getPlayerList()) {
             if (player.getId().equals(order)) {
                 // 通知被选择叫牌的玩家客户端开始叫牌
@@ -112,6 +112,7 @@ public class GameServiceImpl implements GameService {
                 break;
             }
         }
+        roomComponent.updateRoom(room);
     }
 
     @Override
@@ -146,6 +147,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public void noWant(User user) {
         Room room = roomComponent.getUserRoom(user.getId());
+        room.incrBiddingPlayer();
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
                 int playerId = player.getId();
@@ -200,6 +202,7 @@ public class GameServiceImpl implements GameService {
                 throw new ForbiddenException("该玩家出的牌管不了上家");
             }
         }
+        removeNextPlayerRecentCards(room, player);   // 移除下一个玩家最近出的牌
         player.setRecentCards(cardList);
         // 移除玩家列表中打出的牌
         player.removeCards(cardList);
@@ -233,6 +236,7 @@ public class GameServiceImpl implements GameService {
         Room room = roomComponent.getUserRoom(user.getId());
         Player player = room.getPlayerByUserId(user.getId());
 
+        removeNextPlayerRecentCards(room, player);
         room.incrStep();
         roomComponent.updateRoom(room);
 
@@ -250,6 +254,11 @@ public class GameServiceImpl implements GameService {
             }
         }
         return result;
+    }
+
+    private void removeNextPlayerRecentCards(Room room, Player player) {
+        Player nextPlayer = room.getPlayerById(player.getNextPlayerId());
+        nextPlayer.clearRecentCards();
     }
 
 }

@@ -31,4 +31,9 @@ public interface PlayerService {
      */
     boolean canPass(User curUser);
 
+    /**
+     * 判断玩家是否可以叫牌
+     */
+    boolean canBid(User curUser);
+
 }

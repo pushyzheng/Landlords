@@ -76,7 +76,7 @@ public class AuthController {
     /**
      * 用户授权成功之后回调的地址
      */
-    @GetMapping("/connect/callback")
+    @GetMapping("/qqLogin/callback")
     public void callback(HttpServletRequest request, HttpServletResponse response) {
         try {
             AccessToken accessTokenObj = new Oauth().getAccessTokenByRequest(request);
@@ -99,8 +99,9 @@ public class AuthController {
                 userMapper.insert(user);
             }
             String token = saveSession(request, user);
-            response.sendRedirect(FRONTEND_CALLBACK_URL + token);
+            response.sendRedirect("http://landlord.pushy.site/#/oauth/" + token);
         } catch (Exception e) {
+            e.printStackTrace();
             qqLogin(request, response);
         }
     }

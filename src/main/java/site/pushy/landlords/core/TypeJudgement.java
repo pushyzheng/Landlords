@@ -3,9 +3,7 @@ package site.pushy.landlords.core;
 import site.pushy.landlords.core.enums.CardNumberEnum;
 import site.pushy.landlords.pojo.Card;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static site.pushy.landlords.core.enums.CardGradeEnum.*;
 
@@ -146,15 +144,11 @@ public class TypeJudgement {
             return false;
         }
         /* 判断卡片数组是不是递增的，如果是递增的，说明是顺子 */
-        for (int i = 0; i < cards.size(); i++) {
-            if (i == cards.size() - 1) {
-                /* 牌尾那张牌不需要再进行比较，直接跳出循环 */
-                break;
-            }
+        for (int i = 0; i < cards.size() - 1; i++) {
             /* 将每一张牌和它的后一张牌对比，是否相差1 */
-            Card current = cards.get(i);
+            Card cur = cards.get(i);
             Card next = cards.get(i + 1);
-            if ((current.getGradeValue() + 1) != next.getGradeValue()) {
+            if ((cur.getGradeValue() + 1) != next.getGradeValue()) {
                 return false;
             }
         }
@@ -224,7 +218,6 @@ public class TypeJudgement {
         Collections.sort(cards);
 
         for (int i = 0; i < cards.size(); i += 3) {
-
             if (i == cards.size() - 3) {
                 /* 比较最后一个飞机的三张牌是否相等 */
                 return isAllGradeEqual(cards.subList(cards.size() - 3, cards.size()));
@@ -242,18 +235,8 @@ public class TypeJudgement {
     }
 
     /**
-     * 判断传入的卡牌数组是否全部是相同数字的牌，如4444，返回true
+     * 判断传入的卡牌数组是否全部是相同等级的牌，如4444，返回true
      */
-    private static boolean isAllEqual(List<Card> cards) {
-        Card first = cards.get(0);
-        for (int i = 1; i < cards.size(); i++) {
-            if (!first.equals(cards.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private static boolean isAllGradeEqual(List<Card> cards) {
         Card first = cards.get(0);
         for (int i = 1; i < cards.size(); i++) {

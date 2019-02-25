@@ -36,6 +36,7 @@ public class PlayerServiceImpl implements PlayerService {
             throw new BadRequestException("游戏还未开始");
         }
         Player player = room.getPlayerByUserId(curUser.getId());
+        if (room.getStepNum() == -1) return false;  // 当step == -1时，代表叫牌未结束，直接返回false
         int remainder = room.getStepNum() % 3;
         if (remainder == 0) {
             if (player.getId() != 3) return false;
@@ -66,6 +67,15 @@ public class PlayerServiceImpl implements PlayerService {
             return player.getIdentity() != IdentityEnum.LANDLORD;
         }
         return room.getPrePlayerId() != player.getId();
+    }
+
+    @Override
+    public boolean canBid(User curUser) {
+        Room room = roomComponent.getUserRoom(curUser.getId());
+        Player player = room.getPlayerByUserId(curUser.getId());
+
+        if (room.getStepNum() != -1) return false;
+        return player.getId() == room.getBiddingPlayer();
     }
 
 }

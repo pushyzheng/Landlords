@@ -51,4 +51,9 @@ public class PlayerController {
         return RespEntity.success(playerService.canPass(curUser));
     }
 
+    @GetMapping("/bidding")
+    public String bid(@SessionAttribute User curUser) {
+        return RespEntity.success(playerService.canBid(curUser));
+    }
+
 }

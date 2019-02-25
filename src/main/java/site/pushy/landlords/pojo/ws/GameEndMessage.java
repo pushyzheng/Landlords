@@ -3,6 +3,7 @@ package site.pushy.landlords.pojo.ws;
 import lombok.Data;
 import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.core.enums.WsMessageTypeEnum;
+import site.pushy.landlords.pojo.DTO.ResultScoreDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class GameEndMessage extends Message {
 
     private boolean winning;            // 该玩家是否胜利
 
-    private List<Map<String, Integer>> resList;
+    private List<ResultScoreDTO> resList;
 
     public String getWiningIdentityName() {
         return winingIdentity.getName();

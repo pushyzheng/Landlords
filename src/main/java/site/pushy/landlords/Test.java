@@ -1,5 +1,6 @@
 package site.pushy.landlords;
 
+import site.pushy.landlords.core.CardDistribution;
 import site.pushy.landlords.core.TypeJudgement;
 import site.pushy.landlords.core.enums.CardNumberEnum;
 import site.pushy.landlords.pojo.Card;
@@ -60,15 +61,23 @@ public class Test {
 //        System.out.println(TypeJudgement.isStraight(cards));
 
 //        连对
-//        Card a = new Card(ELEVENTH);
-//        Card b = new Card(ELEVENTH);
-//        Card c = new Card(TWELFTH);
-//        Card d = new Card(TWELFTH);
-//        Card e = new Card(THIRTEENTH);
-//        Card f = new Card(THIRTEENTH);
+        Card aa = new Card(SEVENTH);
+        Card ab = new Card(SEVENTH);
+
+        Card a = new Card(EIGHTH);
+        Card b = new Card(EIGHTH);
+        Card c = new Card(NINTH);
+        Card d = new Card(TWELFTH);
+        Card e = new Card(TENTH);
+        Card f = new Card(TENTH);
+        Card g = new Card(ELEVENTH);
+        Card h = new Card(ELEVENTH);
+
+        Card i = new Card(TWELFTH);
+        Card j = new Card(TWELFTH);
 //
-//        List<Card> cards = Arrays.asList(a, b, c, d, e, f);
-//        System.out.println(TypeJudgement.isStraightPair(cards));
+        List<Card> cards = Arrays.asList(aa, ab, a, b, c, d, e, f, g, h, i, j);
+        System.out.println(TypeJudgement.isStraightPair(cards));
 
         /*Card a = new Card();
         a.setGrade(CardGradeEnum.THIRD);
@@ -104,5 +113,7 @@ public class Test {
 //        List<Card> cards = Arrays.asList(a, b, c, d, e, f);
 //        System.out.println(TypeJudgement.isFourWithTwo(cards));
 
+//        CardDistribution distribution = new CardDistribution();
+//        distribution.refresh();
     }
 }

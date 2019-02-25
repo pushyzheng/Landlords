@@ -22,6 +22,8 @@ public class Room {
 
     private String title;             // 房间标题
 
+    private User owner;               // 房主用户对象
+
     private boolean locked;           // 房间是否设置密码,true为设置
 
     private List<Player> playerList;  // 当前玩家列表
@@ -33,6 +35,8 @@ public class Room {
     private int multiple;             // 房间底分
 
     private int stepNum;              // 每局走的步数，用来控制玩家的出牌回合
+
+    private int biddingPlayer;     // 叫牌的玩家
 
     private List<Card> preCards;      // 上一回合玩家打出的牌
 
@@ -50,8 +54,9 @@ public class Room {
         this.playerList = new ArrayList<>();
         this.userList = new ArrayList<>();
         this.multiple = 1;
-        this.stepNum = 1;
         this.prePlayerId = 0;
+        this.stepNum = -1;   // 当step = -1时代表叫牌还未结束
+        this.biddingPlayer = -1;
     }
 
     public Room(String id) {
@@ -64,10 +69,11 @@ public class Room {
      */
     public void reset() {
         this.multiple = 1;
-        this.stepNum = 1;
         this.status = RoomStatusEnum.PREPARING;
         this.preCards = null;
         this.prePlayerId = 0;
+        this.stepNum = -1;
+        this.biddingPlayer = -1;
         // 初始化Player对象的值
         for (Player player : playerList) {
             player.reset();
@@ -102,6 +108,11 @@ public class Room {
 
     public void incrStep() {
         stepNum++;
+    }
+
+    public void incrBiddingPlayer() {
+        if (biddingPlayer == 3) biddingPlayer = 1;
+        else biddingPlayer++;
     }
 
     public void doubleMultiple() {

@@ -5,7 +5,7 @@ import site.pushy.landlords.pojo.Card;
 import java.util.*;
 
 /**
- * 每局开始重新发牌、分牌、获取每个玩家的牌、分配玩家身份。
+ * 每局开始重新发牌、分牌、获取每个玩家的牌
  *
  * @author Pushy
  * @since 2018/12/30 21:49

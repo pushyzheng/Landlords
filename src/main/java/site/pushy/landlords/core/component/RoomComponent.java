@@ -37,6 +37,7 @@ public class RoomComponent {
         String roomId = newRoomid();
         Room room = new Room(roomId);
         room.setTitle(title);
+        room.setOwner(user);
         Player player = new Player(1);  // //创建房间的人座位顺序为1
         player.setUser(user);
         room.addUser(user);
