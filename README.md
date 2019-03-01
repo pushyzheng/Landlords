@@ -14,7 +14,7 @@
 
 **发牌动画**
 
-<video src="https://static.pushy.site/video/landlord-deal.mp4"></video>
+![5afc60a9673d872732ee1694126b57d0.GIF](https://i.loli.net/2019/03/01/5c792c6fb2d0d.gif)
 
 **出牌回合**
 
@@ -24,15 +24,28 @@
 
 ![game-end.png](https://i.loli.net/2019/03/01/5c79292ed3d91.png)
 
+## 设计思路
+
+如果你对这个的后台设计思路感兴趣，可以阅读我的博客中斗地主的相关系列：
+
+[H5斗地主游戏应用后台教程（一）—— 应用和个体的总体设计](https://pushy.site/2019/02/21/landroad-backend-1/)
+
+[H5斗地主游戏应用后台教程（二）—— 算法模块的实现](https://pushy.site/2019/02/21/landroad-backend-2/)
+
+[H5斗地主游戏应用后台教程（三）—— 业务模块的实现](https://pushy.site/2019/02/21/landroad-backend-3/)
+
 ## 贡献者
+
+感谢以下开发者对本项目的贡献：
 
 [![alt text](https://avatars3.githubusercontent.com/u/45006187?s=460&v=4 "title")](https://github.com/Fx12138)
 
-Fx12138
+`Fx12138`
 
 ## 联系我
 
-如果你在游戏的过程中，遇到什么bug需要反馈；或者由项目的实现细节需要提问，可以通过下面的联系方式联系我：
+如果您在游戏的过程中遇到任何`bug`或者您有什么改进的建议，以及有项目的实现细节需要提问，都可以通过下面的联系方式联系我：
 
 - Email：1437876073@qq.com
 - QQ：1437876073
+
