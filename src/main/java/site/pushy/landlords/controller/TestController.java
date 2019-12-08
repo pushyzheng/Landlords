@@ -1,11 +1,13 @@
 package site.pushy.landlords.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.core.component.NotifyComponent;
+import site.pushy.landlords.pojo.DO.User;
 
 /**
  * @author Pushy
@@ -26,4 +28,8 @@ public class TestController {
         return RespEntity.success(res);
     }
 
+    @GetMapping("/test1")
+    public String test() {
+        return RespEntity.success(new User());
+    }
 }
