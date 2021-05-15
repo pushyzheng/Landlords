@@ -1,18 +1,5 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : pushy
- Source Server Type    : MySQL
- Source Server Version : 50722
- Source Host           : 120.78.165.238:3306
- Source Schema         : landlords
-
- Target Server Type    : MySQL
- Target Server Version : 50722
- File Encoding         : 65001
-
- Date: 08/12/2019 22:50:29
-*/
+CREATE DATABASE landlords DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE landlords;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

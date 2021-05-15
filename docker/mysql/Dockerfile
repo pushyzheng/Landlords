@@ -1,0 +1,10 @@
+FROM mysql:5.7.23
+
+ENV AUTO_RUN_DIR /docker-entrypoint-initdb.d
+
+ENV INSTALL_DB_SQL db.sql
+
+COPY ./$INSTALL_DB_SQL $AUTO_RUN_DIR/
+
+RUN cat $INSTALL_DB_SQL
+RUN chmod a+x $AUTO_RUN_DIR/$INSTALL_DB_SQL
