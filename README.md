@@ -4,8 +4,6 @@
 
 `Landlords`是一款可以在线和好友斗地主的游戏，开发初心是因为市面上的大多数斗地主游戏都不支持好友同玩。而`Landlords`则可以满足你和好友开黑的乐趣！
 
-在线体验地址：[http://landlord.pushy.site/#/](http://landlord.pushy.site/#/)
-
 ## 游戏截图
 
 **游戏大厅**
