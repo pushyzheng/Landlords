@@ -1,11 +1,16 @@
 package site.pushy.landlords.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * 牌的类型枚举值
  *
  * @author Pushy
  * @since 2018/12/28 21:22
  */
+@AllArgsConstructor
+@Getter
 public enum CardTypeEnum {
 
     SPADE("黑桃"),
@@ -20,12 +25,4 @@ public enum CardTypeEnum {
     BIG_JOKER("大王");
 
     private final String name;
-
-    CardTypeEnum(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

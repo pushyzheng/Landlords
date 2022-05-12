@@ -1,7 +1,7 @@
 package site.pushy.landlords.core.enums;
 
-import java.util.Arrays;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 牌的等级枚举值
@@ -9,6 +9,8 @@ import java.util.List;
  * @author Pushy
  * @since 2018/12/29 1:04
  */
+@AllArgsConstructor
+@Getter
 public enum CardGradeEnum {
 
     // 3 ~ K
@@ -33,12 +35,4 @@ public enum CardGradeEnum {
     FIFTEENTH(15);
 
     private final int value;
-
-    CardGradeEnum(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
 }

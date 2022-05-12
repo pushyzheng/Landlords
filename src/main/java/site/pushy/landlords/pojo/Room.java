@@ -1,7 +1,6 @@
 package site.pushy.landlords.pojo;
 
 import lombok.Data;
-import org.springframework.web.socket.WebSocketSession;
 import site.pushy.landlords.core.CardDistribution;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
@@ -16,36 +15,75 @@ import java.util.List;
 @Data
 public class Room {
 
-    private String id;                // 房间号
+    /**
+     * 房间号
+     */
+    private String id;
 
-    private String password;          // 房间密码
+    /**
+     * 房间密码
+     */
+    private String password;
 
-    private String title;             // 房间标题
+    /**
+     * 房间标题
+     */
+    private String title;
 
-    private User owner;               // 房主用户对象
+    /**
+     * 房主用户对象
+     */
+    private User owner;
 
-    private boolean locked;           // 房间是否设置密码,true为设置
+    /**
+     * 房间是否设置密码,true为设置
+     */
+    private boolean locked;
 
-    private List<Player> playerList;  // 当前玩家列表
+    /**
+     * 当前玩家列表
+     */
+    private List<Player> playerList;
 
-    private List<User> userList;      // 当前用户列表
+    /**
+     * 当前用户列表
+     */
+    private List<User> userList;
 
-    private RoomStatusEnum status;    // 房间的状态
+    /**
+     * 房间的状态
+     */
+    private RoomStatusEnum status;
 
-    private int multiple;             // 房间底分
+    /**
+     * 房间底分
+     */
+    private int multiple;
 
-    private int stepNum;              // 每局走的步数，用来控制玩家的出牌回合
+    /**
+     * 每局走的步数，用来控制玩家的出牌回合
+     */
+    private int stepNum;
 
-    private int biddingPlayer;     // 叫牌的玩家
+    /**
+     * 叫牌的玩家
+     */
+    private int biddingPlayer;
 
-    private List<Card> preCards;      // 上一回合玩家打出的牌
+    /**
+     * 上一回合玩家打出的牌
+     */
+    private List<Card> preCards;
 
-    private int prePlayerId;          // 上一回合玩家的playerId
+    /**
+     * 上一回合玩家的 playerId
+     */
+    private int prePlayerId;
 
     private CardDistribution distribution;
 
     public String getStatusValue() {
-        return status != null ? status.value() : "";
+        return status != null ? status.getValue() : "";
     }
 
     public Room() {

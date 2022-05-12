@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public User getUser(String id) {
+    public User getUserById(String id) {
         if (!StringUtils.hasLength(id)) {
             throw new IllegalArgumentException("用户 ID 不能为空");
         }

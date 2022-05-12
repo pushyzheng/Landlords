@@ -19,5 +19,4 @@ public interface AchievementService {
      * 获取某用户的战绩信息
      */
     Achievement getAchievementByUserId(String userId);
-
 }

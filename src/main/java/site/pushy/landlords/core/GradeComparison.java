@@ -23,7 +23,7 @@ public class GradeComparison {
      * @param prevCards 上家的牌
      */
     public static boolean canPlayCards(List<Card> myCards, TypeEnum myType,
-                                     List<Card> prevCards, TypeEnum prevType) {
+                                       List<Card> prevCards, TypeEnum prevType) {
         if (myCards == null || prevCards == null) {
             return false;
         }
@@ -60,7 +60,7 @@ public class GradeComparison {
             return CardUtils.compareGradeTo(myCard, prevCard);
         }
         /* 3带一对，只需要比较第三张牌即可 */
-        else if (prevType ==TypeEnum.THREE_WITH_PAIR) {
+        else if (prevType == TypeEnum.THREE_WITH_PAIR) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
             return CardUtils.compareGradeTo(myCard, prevCard);
@@ -99,9 +99,10 @@ public class GradeComparison {
 
     /**
      * 判断当前玩家手中是否有牌可以管住上家出的牌
-     * @param myCards 当前玩家手中所有的牌
+     *
+     * @param myCards   当前玩家手中所有的牌
      * @param prevCards 上家出的牌
-     * @param prevType 上家出的牌的类型
+     * @param prevType  上家出的牌的类型
      */
     public static boolean hasHighGradeCards(List<Card> myCards,
                                             List<Card> prevCards, TypeEnum prevType) {

@@ -34,6 +34,9 @@ public class CardUtils {
         return compareGrade(card, other) == 1;
     }
 
+    /**
+     * 对牌进行从小到大地排序
+     */
     public static void sortCards(List<Card> cards) {
         cards.sort(CARD_COMPARATOR);
     }

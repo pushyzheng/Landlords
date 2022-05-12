@@ -1,10 +1,8 @@
 package site.pushy.landlords.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
-import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.dao.AchievementMapper;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.Achievement;
@@ -17,12 +15,12 @@ import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.pojo.ws.GameEndMessage;
 import site.pushy.landlords.service.AchievementService;
 
+import javax.annotation.Resource;
+
 import static site.pushy.landlords.core.enums.IdentityEnum.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Fuxing
@@ -31,16 +29,16 @@ import java.util.Map;
 @Service
 public class AchievementServiceImpl implements AchievementService {
 
-    @Autowired
+    @Resource
     private AchievementMapper achievementMapper;
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
-    @Autowired
+    @Resource
     private NotifyComponent notifyComponent;
 
     @Override
@@ -106,7 +104,8 @@ public class AchievementServiceImpl implements AchievementService {
     }
 
     /**
-     * 通过userId更新某用户的战绩信息
+     * 通过 userId 更新某用户的战绩信息
+     *
      * @param isWinning 是否胜利
      */
     private void updateAchievement(String userId, boolean isWinning) {

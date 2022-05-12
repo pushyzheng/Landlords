@@ -1,11 +1,9 @@
 package site.pushy.landlords.controller;
 
 import org.springframework.web.bind.annotation.*;
-import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.pojo.DTO.LoginDTO;
 import site.pushy.landlords.pojo.DTO.UserDTO;
 import site.pushy.landlords.service.UserService;
 
@@ -32,7 +30,7 @@ public class UserController {
     @PutMapping("")
     public String updateUser(@SessionAttribute User curUser, HttpServletRequest request,
                              @Valid @RequestBody UserDTO userDTO) {
-        User record = userService.getUser(curUser.getId());
+        User record = userService.getUserById(curUser.getId());
         if (record == null) {
             throw new UnauthorizedException("用户信息为空");
         }

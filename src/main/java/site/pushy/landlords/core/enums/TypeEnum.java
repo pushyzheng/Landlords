@@ -1,9 +1,14 @@
 package site.pushy.landlords.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * @author Pushy
  * @since 2018/12/29 15:20
  */
+@AllArgsConstructor
+@Getter
 public enum TypeEnum {
 
     SINGLE("单张"),
@@ -24,12 +29,4 @@ public enum TypeEnum {
     FOUR_WITH_TWO("四带二");
 
     private final String name;
-
-    TypeEnum(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

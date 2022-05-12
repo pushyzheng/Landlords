@@ -8,6 +8,8 @@ import site.pushy.landlords.core.enums.CardTypeEnum;
 import java.util.Objects;
 
 /**
+ * 每张牌的抽象
+ *
  * @author Pushy
  * @since 2018/12/28 21:41
  */
@@ -15,7 +17,7 @@ import java.util.Objects;
 public class Card implements Comparable<Card> {
 
     /**
-     * 牌的数字ID
+     * 牌的数字 ID
      */
     private int id;
 

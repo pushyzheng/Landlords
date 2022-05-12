@@ -1,17 +1,15 @@
 package site.pushy.landlords.common.interceptor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import site.pushy.landlords.common.util.JWTUtil;
 import site.pushy.landlords.common.util.RespEntity;
-import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.service.UserService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -21,15 +19,16 @@ import java.io.PrintWriter;
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private UserMapper userMapper;
+    @Resource
+    private UserService userService;
 
     @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse response, Object handler) throws Exception {
-        if (httpServletRequest.getMethod().equals("OPTIONS"))
+    public boolean preHandle(HttpServletRequest httpServletRequest,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
+        if (httpServletRequest.getMethod().equals("OPTIONS")) {
             return true;
+        }
 
         // 在拦截点执行前拦截，如果返回true则不执行拦截点后的操作（拦截成功）
         // 返回false则不执行拦截
@@ -43,7 +42,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
             try {
                 String id = JWTUtil.decode(token);
-                User user = userMapper.selectByPrimaryKey(id);
+                User user = userService.getUserById(id);
                 session.setAttribute("curUser", user);
                 return true;
             } catch (Exception e) {
@@ -77,7 +76,5 @@ public class LoginInterceptor implements HandlerInterceptor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 }

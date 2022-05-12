@@ -1,9 +1,14 @@
 package site.pushy.landlords.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * @author Pushy
  * @since 2019/1/24 12:25
  */
+@AllArgsConstructor
+@Getter
 public enum WsMessageTypeEnum {
 
     READY_GAME("玩家准备"),
@@ -24,13 +29,5 @@ public enum WsMessageTypeEnum {
 
     PONG("心跳检测");
 
-    private String value;
-
-    WsMessageTypeEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    private final String value;
 }

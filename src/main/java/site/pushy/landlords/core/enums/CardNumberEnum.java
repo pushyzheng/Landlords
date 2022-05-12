@@ -1,11 +1,16 @@
 package site.pushy.landlords.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * 牌的数值枚举值
  *
  * @author Pushy
  * @since 2018/12/28 21:23
  */
+@AllArgsConstructor
+@Getter
 public enum CardNumberEnum {
 
     ONE(1),
@@ -26,13 +31,5 @@ public enum CardNumberEnum {
     SMALL_JOKER(14),  // 小王
     BIG_JOKER(15);    // 大王
 
-    private int value;
-
-    CardNumberEnum(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
+    private final int value;
 }

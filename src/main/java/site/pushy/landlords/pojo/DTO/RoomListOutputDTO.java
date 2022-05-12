@@ -31,7 +31,7 @@ public class RoomListOutputDTO {
     private UserOutDTO owner;
 
     /**
-     * 房间是否设置密码,true为设置
+     * 房间是否设置密码, true 为设置
      */
     private boolean locked;
 
@@ -57,6 +57,6 @@ public class RoomListOutputDTO {
     }
 
     public String getStatusValue() {
-        return status != null ? status.value() : "";
+        return status != null ? status.getValue() : "";
     }
 }

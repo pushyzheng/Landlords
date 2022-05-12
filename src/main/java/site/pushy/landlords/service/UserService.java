@@ -4,7 +4,7 @@ import site.pushy.landlords.pojo.DO.User;
 
 public interface UserService {
 
-    User getUser(String id);
+    User getUserById(String id);
 
     boolean updateUser(User user);
 }

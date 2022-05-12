@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebSocketPushHandler implements WebSocketHandler {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketPushHandler.class);
 
     private static final ConcurrentHashMap<String, WebSocketSession> userMap =
             new ConcurrentHashMap<>();
