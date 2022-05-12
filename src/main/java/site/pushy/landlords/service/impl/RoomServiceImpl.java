@@ -1,6 +1,5 @@
 package site.pushy.landlords.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.core.component.NotifyComponent;
@@ -15,6 +14,8 @@ import site.pushy.landlords.pojo.ws.PlayerExitMessage;
 import site.pushy.landlords.pojo.ws.PlayerJoinMessage;
 import site.pushy.landlords.service.RoomService;
 
+import javax.annotation.Resource;
+
 /**
  * @author Pushy
  * @since 2019/2/15 22:39
@@ -22,10 +23,10 @@ import site.pushy.landlords.service.RoomService;
 @Service
 public class RoomServiceImpl implements RoomService {
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
-    @Autowired
+    @Resource
     private NotifyComponent notifyComponent;
 
     @Override
@@ -59,21 +60,19 @@ public class RoomServiceImpl implements RoomService {
         String roomPassword = roomDTO.getPassword();
         String message = roomComponent.joinRoom(roomId, curUser, roomPassword);
 
-        /* 通知房间内的玩家客户端有新的玩家加入 */
-        Message playerJoinMessage = new PlayerJoinMessage(curUser);
-        notifyComponent.sendToAllUserOfRoom(roomId, playerJoinMessage);
-
+        // 通知房间内的玩家客户端有新的玩家加入
+        notifyComponent.sendToAllUserOfRoom(roomId, new PlayerJoinMessage(curUser));
         return message;
     }
 
     @Override
-    public void exitRoom(User curUser) {
+    public boolean exitRoom(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
         boolean hasRemove = roomComponent.exitRoom(room.getId(), curUser);
         if (!hasRemove) {
-            /* 通知房间内的玩家客户端有玩家退出 */
-            Message playerJoinMessage = new PlayerExitMessage(curUser);
-            notifyComponent.sendToAllUserOfRoom(room.getId(), playerJoinMessage);
+            // 通知房间内的玩家客户端有玩家退出
+            notifyComponent.sendToAllUserOfRoom(room.getId(), new PlayerExitMessage(curUser));
         }
+        return hasRemove;
     }
 }

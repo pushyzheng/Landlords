@@ -1,7 +1,9 @@
 package site.pushy.landlords.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.pojo.DO.User;
@@ -46,7 +48,6 @@ public class RoomController {
 
     /**
      * 通过房间号id查看某房间的所有信息，该玩家必须在该房间内
-     * @author Pushy
      */
     @GetMapping("/{id}")
     public String getRoomById(@PathVariable String id,
@@ -60,8 +61,12 @@ public class RoomController {
     @PostMapping("")
     public String createRoom(@SessionAttribute User curUser,
                              @RequestBody JSONObject body) {
+        String title = body.getString("title");
+        if (!StringUtils.hasLength(title)) {
+            throw new BadRequestException("房间名称不能为空");
+        }
         return RespEntity.success(roomService.createRoom(curUser, body.getString("password"),
-                body.getString("title")));
+                title));
     }
 
     /**
@@ -78,7 +83,6 @@ public class RoomController {
      */
     @PostMapping("/exit")
     public String exitRoom(@SessionAttribute User curUser) {
-        roomService.exitRoom(curUser);
-        return RespEntity.success("success");
+        return RespEntity.success(roomService.exitRoom(curUser));
     }
 }

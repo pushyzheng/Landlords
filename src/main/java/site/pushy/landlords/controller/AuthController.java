@@ -7,8 +7,6 @@ import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.config.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
@@ -18,7 +16,7 @@ import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DO.UserExample;
-import site.pushy.landlords.pojo.DTO.UserDTO;
+import site.pushy.landlords.pojo.DTO.LoginDTO;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +45,7 @@ public class AuthController {
      * 用户登录
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid @RequestBody UserDTO body, HttpServletRequest request) {
+    public String login(@Valid @RequestBody LoginDTO body, HttpServletRequest request) {
         User user = getUserByName(body.getUsername());
         if (user == null) {
             // 用户第一次登录，增加用户记录

@@ -70,6 +70,7 @@ public class GameServiceImpl implements GameService {
         Room room = roomComponent.getRoom(roomId);
         room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
 
+        // TODO: concurrent problem
         /* 构造 CardDistribution类，进行发牌 */
         room.setDistribution(new CardDistribution());
         CardDistribution distribution = room.getDistribution();

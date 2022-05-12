@@ -15,17 +15,35 @@ import java.util.stream.Collectors;
 @Data
 public class RoomListOutputDTO {
 
-    private String id;                // 房间号
+    /**
+     * 房间号
+     */
+    private String id;
 
+    /**
+     * 房间标题
+     */
     private String title;
 
+    /**
+     * 房主
+     */
     private UserOutDTO owner;
 
-    private boolean locked;           // 房间是否设置密码,true为设置
+    /**
+     * 房间是否设置密码,true为设置
+     */
+    private boolean locked;
 
-    private List<UserOutDTO> userList;      // 当前用户列表
+    /**
+     * 当前用户列表
+     */
+    private List<UserOutDTO> userList;
 
-    private RoomStatusEnum status;    // 房间的状态
+    /**
+     * 房间的状态
+     */
+    private RoomStatusEnum status;
 
     public RoomListOutputDTO(Room room) {
         id = room.getId();
@@ -41,5 +59,4 @@ public class RoomListOutputDTO {
     public String getStatusValue() {
         return status != null ? status.value() : "";
     }
-
 }

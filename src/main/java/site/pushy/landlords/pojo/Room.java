@@ -124,7 +124,9 @@ public class Room {
      */
     public Player getPlayerByUserId(String userId) {
         for (Player player : playerList) {
-            if (player.getUser().getId().equals(userId)) return player;
+            if (player.getUser().getId().equals(userId)) {
+                return player;
+            }
         }
         return null;
     }

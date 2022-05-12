@@ -20,32 +20,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoomComponent {
 
     // 用户玩家当前所在的房间号映射Map
-    private Map<String, String> userRoomMap = new ConcurrentHashMap<>();
+    private final Map<String, String> userRoomMap = new ConcurrentHashMap<>();
 
     // 房间号和与该房间所对应的Room对象映射Map
-    private Map<String, Room> roomMap = new ConcurrentHashMap<>();
+    private final Map<String, Room> roomMap = new ConcurrentHashMap<>();
 
     /**
      * 创建房间
+     *
      * @param user
      * @return
      */
     public Room createRoom(User user, String roomPassword, String title) {
         if (getUserRoomId(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId() + " 的房间"));
+            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
         }
         String roomId = newRoomid();
         Room room = new Room(roomId);
         room.setTitle(title);
         room.setOwner(user);
-        Player player = new Player(1);  // //创建房间的人座位顺序为1
+        // 默认情况下创建房间的人座位顺序为 1
+        Player player = new Player(1);
         player.setUser(user);
         room.addUser(user);
         room.addPlayer(player);
 
-        //是否设置密码
+        // 是否设置密码
         if (roomPassword != null && !roomPassword.isEmpty()) {
-            //设置了
             room.setLocked(true);
             room.setPassword(roomPassword);
         }
@@ -138,6 +139,7 @@ public class RoomComponent {
 
     /**
      * 退出房间
+     *
      * @return 房间是否被解散
      */
     public boolean exitRoom(String id, User curUser) {
@@ -185,30 +187,17 @@ public class RoomComponent {
     }
 
     /**
-     * 列出房间内每个玩家的牌
-     */
-    public Map<Player, List<Card>> getRoomCards(String id) {
-        Room room = roomMap.get(id);
-        Map<Player, List<Card>> cardMap = new HashMap<>();
-        for (Player player : room.getPlayerList()) {
-            List<Card> cardList = player.getCards();
-            cardMap.put(player, cardList);
-        }
-        return cardMap;
-    }
-
-    /**
-     * 通过userId获取当前用户在其房间内游戏内的牌列表
-     * @param userId
+     * 通过 userId 获取当前用户在其房间内游戏内的牌列表
+     *
+     * @param userId 用户 ID
      */
     public List<Card> getUserCards(String userId) {
         Room room = getUserRoom(userId);
-        for (Player player : room.getPlayerList()) {
-            if (player.getUser().getId().equals(userId)) {
-                return player.getCards();
-            }
+        Player player = room.getPlayerByUserId(userId);
+        if (player == null) {
+            throw new NotFoundException("未找到该玩家");
         }
-        throw new NotFoundException("未找到该玩家");
+        return player.getCards();
     }
 
     /**

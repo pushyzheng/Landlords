@@ -17,6 +17,5 @@ public interface RoomService {
 
     String joinRoom(User curUser, RoomDTO roomDTO);
 
-    void exitRoom(User curUser);
-
+    boolean exitRoom(User curUser);
 }

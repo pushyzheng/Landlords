@@ -1,6 +1,5 @@
 package site.pushy.landlords.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.core.component.RoomComponent;
@@ -12,6 +11,7 @@ import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.service.PlayerService;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
     @Override
@@ -32,11 +32,14 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public boolean isPlayerRound(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        if (room.getStatus() == RoomStatusEnum.PREPARING) {
+        if (room.getStatus() != RoomStatusEnum.PLAYING) {
             throw new BadRequestException("游戏还未开始");
         }
         Player player = room.getPlayerByUserId(curUser.getId());
-        if (room.getStepNum() == -1) return false;  // 当step == -1时，代表叫牌未结束，直接返回false
+        if (room.getStepNum() == -1) {
+            // 叫牌未结束，直接返回 false
+            return false;
+        }
         int remainder = room.getStepNum() % 3;
         if (remainder == 0) {
             if (player.getId() != 3) return false;
@@ -49,7 +52,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public boolean isPlayerReady(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        if (room.getStatus() == RoomStatusEnum.PLAYING) {
+        if (room.getStatus() != RoomStatusEnum.PLAYING) {
             throw new BadRequestException("游戏已经开始");
         }
         Player player = room.getPlayerByUserId(curUser.getId());
@@ -59,7 +62,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public boolean canPass(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        if (room.getStatus() == RoomStatusEnum.PREPARING) {
+        if (room.getStatus() != RoomStatusEnum.PLAYING) {
             throw new BadRequestException("游戏还未开始");
         }
         Player player = room.getPlayerByUserId(curUser.getId());
@@ -72,10 +75,14 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public boolean canBid(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
+        if (room.getStatus() != RoomStatusEnum.PLAYING) {
+            throw new BadRequestException("游戏还未开始");
+        }
         Player player = room.getPlayerByUserId(curUser.getId());
 
-        if (room.getStepNum() != -1) return false;
+        if (room.getStepNum() != -1) {
+            return false;
+        }
         return player.getId() == room.getBiddingPlayer();
     }
-
 }

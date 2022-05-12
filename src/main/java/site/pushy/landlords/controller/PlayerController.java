@@ -1,6 +1,5 @@
 package site.pushy.landlords.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,9 +7,9 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.service.GameService;
 import site.pushy.landlords.service.PlayerService;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ import java.util.List;
 @RequestMapping(value = "/player", produces = "application/json")
 public class PlayerController {
 
-    @Autowired
+    @Resource
     private PlayerService playerService;
 
     /**
@@ -55,5 +54,4 @@ public class PlayerController {
     public String bid(@SessionAttribute User curUser) {
         return RespEntity.success(playerService.canBid(curUser));
     }
-
 }

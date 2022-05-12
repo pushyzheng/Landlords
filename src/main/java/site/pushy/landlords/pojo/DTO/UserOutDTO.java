@@ -16,15 +16,12 @@ public class UserOutDTO {
 
     private String gender;
 
-    private Double money;
-
     private String avatar;
 
     public UserOutDTO(User user) {
         id = user.getId();
         username = user.getUsername();
         gender = user.getGender();
-        money = user.getMoney();
         avatar = user.getAvatar();
     }
 }

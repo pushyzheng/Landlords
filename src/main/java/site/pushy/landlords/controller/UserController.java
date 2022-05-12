@@ -1,12 +1,17 @@
 package site.pushy.landlords.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import site.pushy.landlords.common.exception.NotFoundException;
-import site.pushy.landlords.common.util.JWTUtil;
+import site.pushy.landlords.common.exception.BadRequestException;
+import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.RespEntity;
-import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.DTO.LoginDTO;
+import site.pushy.landlords.pojo.DTO.UserDTO;
+import site.pushy.landlords.service.UserService;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 /**
  * @author Fuxing
@@ -16,35 +21,27 @@ import site.pushy.landlords.pojo.DO.User;
 @RequestMapping(value = "/users", produces = "application/json")
 public class UserController {
 
-    @Autowired
-    private UserMapper userMapper;
+    @Resource
+    private UserService userService;
 
     @GetMapping("/myself")
     public String getMyUser(@SessionAttribute User curUser) {
         return RespEntity.success(curUser);
     }
 
-    /**
-     * 通过id获得用户
-     */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String getById(@PathVariable String id) {
-        User user = userMapper.selectByPrimaryKey(id);
-        if (user == null)
-            throw new NotFoundException("未找到此用户");
-        return RespEntity.success(user);
+    @PutMapping("")
+    public String updateUser(@SessionAttribute User curUser, HttpServletRequest request,
+                             @Valid @RequestBody UserDTO userDTO) {
+        User record = userService.getUser(curUser.getId());
+        if (record == null) {
+            throw new UnauthorizedException("用户信息为空");
+        }
+        record.setUsername(userDTO.getUsername());
+        record.setPassword(userDTO.getPassword());
+        record.setAvatar(userDTO.getAvatar());
+        record.setGender(userDTO.getGender());
+        // 更新 session 中的用户信息
+        request.getSession().setAttribute("curUser", record);
+        return RespEntity.success(userService.updateUser(record));
     }
-
-    /**
-     * 删除用户
-     */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable String id) {
-        User user = userMapper.selectByPrimaryKey(id);
-        if (user == null)
-            throw new NotFoundException("用户不存在");
-        userMapper.deleteByPrimaryKey(id);
-        return RespEntity.success("删除成功");
-    }
-
 }
