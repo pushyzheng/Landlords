@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import site.pushy.landlords.common.config.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.JWTUtil;
@@ -19,6 +20,7 @@ import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DO.UserExample;
 import site.pushy.landlords.pojo.DTO.UserDTO;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,13 +35,13 @@ import java.util.List;
 @RequestMapping(value = "", produces = "application/json")
 public class AuthController {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${frontend_callback_url}")
-    private String FRONTEND_CALLBACK_URL;
-
-    @Autowired
+    @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private LandlordsProperties properties;
 
     /**
      * 用户登录
@@ -47,29 +49,30 @@ public class AuthController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@Valid @RequestBody UserDTO body, HttpServletRequest request) {
         User user = getUserByName(body.getUsername());
-        if (user == null) {  // 用户第一次登录，增加用户记录
+        if (user == null) {
+            // 用户第一次登录，增加用户记录
             user = new User(body.getUsername(), body.getPassword());
             userMapper.insert(user);
-        } else {  // 验证密码
-            if (!user.getPassword().equals(body.getPassword())) {
-                throw new UnauthorizedException("账号或密码错误");
-            }
+        } else if (!user.getPassword().equals(body.getPassword())) {
+            logger.warn("登录失败, 账号密码错误: {}", body.getUsername());
+            throw new UnauthorizedException("账号或密码错误");
         }
         String token = saveSession(request, user);
         return RespEntity.success(token);
     }
 
     /**
-     * qq登录
+     * QQ 第三方登录
+     * <p>
+     * 将页面重定向到 QQ 第三方的登录页面
      */
     @GetMapping(value = "/qqLogin")
     public void qqLogin(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/html;charset=utf-8");
         try {
-            // 将页面重定向到qq第三方的登录页面
             response.sendRedirect(new Oauth().getAuthorizeURL(request));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("跳转 QQ 登录异常", e);
         }
     }
 
@@ -99,9 +102,9 @@ public class AuthController {
                 userMapper.insert(user);
             }
             String token = saveSession(request, user);
-            response.sendRedirect("http://landlord.pushy.site/#/oauth/" + token);
+            response.sendRedirect(String.format("http://%s/#/oauth/%s", properties.getFrontendHost(), token));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("QQ 登录回调异常", e);
             qqLogin(request, response);
         }
     }
@@ -138,5 +141,4 @@ public class AuthController {
         List<User> users = userMapper.selectByExample(userExample);
         return users.isEmpty() ? null : users.get(0);
     }
-
 }

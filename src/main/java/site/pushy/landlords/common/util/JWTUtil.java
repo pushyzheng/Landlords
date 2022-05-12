@@ -4,21 +4,25 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import site.pushy.landlords.common.config.LandlordsProperties;
 
 import java.util.Calendar;
 import java.util.Date;
 
+@Service
+public class JWTUtil implements ApplicationContextAware {
 
-public class JWTUtil {
-
-    private static final String SECRET = "DyoonSecret_0581";
+    private static String SECRET;
 
     /**
      * 编码,通过用户的userId编码为Token
-     * @param id
      */
     public static String encode(String id) {
-        Date iatDate = new Date();
         // expire time
         Calendar nowTime = Calendar.getInstance();
         //有10天有效期
@@ -36,7 +40,6 @@ public class JWTUtil {
 
     /**
      * 解码, 通过Token解码出用户的userId
-     * @param token
      */
     public static String decode(String token) {
         Jws<Claims> jws = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
@@ -44,5 +47,12 @@ public class JWTUtil {
         return (String) claims.get("userId");
     }
 
-
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        LandlordsProperties properties = ctx.getBean(LandlordsProperties.class);
+        if (StringUtils.isEmpty(properties.getJwtSecret())) {
+            throw new IllegalArgumentException("The secret cannot be empty");
+        }
+        SECRET = properties.getJwtSecret();
+    }
 }

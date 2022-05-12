@@ -1,7 +1,6 @@
 package site.pushy.landlords.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.core.component.RoomComponent;
@@ -11,6 +10,7 @@ import site.pushy.landlords.pojo.DTO.RoomListOutputDTO;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.service.RoomService;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,15 +23,14 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/rooms", produces = "application/json")
 public class RoomController {
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
-    @Autowired
+    @Resource
     private RoomService roomService;
 
     /**
      * 获取所有房间列表
-     * @return
      */
     @GetMapping("")
     public String listRoom() {
@@ -82,5 +81,4 @@ public class RoomController {
         roomService.exitRoom(curUser);
         return RespEntity.success("success");
     }
-
 }

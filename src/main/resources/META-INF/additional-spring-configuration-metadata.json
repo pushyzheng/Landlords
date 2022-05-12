@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "landlords.jwt-secret",
+      "type": "java.lang.String",
+      "description": "Description for landlords.jwt-secret."
+    },
+    {
+      "name": "landlords.frontend-host",
+      "type": "java.lang.String",
+      "description": "Description for landlords.frontend-host."
+    }
+  ]
+}

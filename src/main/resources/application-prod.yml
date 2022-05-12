@@ -1,4 +1,15 @@
 server:
   port: 8085
 
-frontend_callback_url: http://landlord.pushy.site/#/oauth/
+spring:
+  datasource:
+    name: test
+    url: jdbc:mysql://localhost:3306/landlords?serverTimezone=GMT
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+landlords:
+  frontend-host: landlord.pushyzheng.com
+  jwt-secret: 298b8610-6835-4d12-b8ae-efba3dbcccad

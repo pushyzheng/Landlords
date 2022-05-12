@@ -8,29 +8,29 @@
 
 **游戏大厅**
 
-![game-center.png](https://i.loli.net/2019/03/01/5c7927eb1e33d.png)
+![game-center.png](images/5c7927eb1e33d.png)
 
 **发牌动画**
 
-![5afc60a9673d872732ee1694126b57d0.GIF](https://i.loli.net/2019/03/01/5c792c6fb2d0d.gif)
+![5afc60a9673d872732ee1694126b57d0.GIF](images/5c792c6fb2d0d.gif)
 
 **出牌回合**
 
-![game-playing.png](https://i.loli.net/2019/03/01/5c79291f3a6e8.png)
+![game-playing.png](images/5c79291f3a6e8.png)
 
 **结束计分板**
 
-![game-end.png](https://i.loli.net/2019/03/01/5c79292ed3d91.png)
+![game-end.png](images/5c79292ed3d91.png)
 
 ## 设计思路
 
 如果你对这个的后台设计思路感兴趣，可以阅读我的博客中斗地主的相关系列：
 
-[H5斗地主游戏应用后台教程（一）—— 应用和个体的总体设计](https://pushy.site/2019/02/21/landroad-backend-1/)
+[H5斗地主游戏应用后台教程（一）—— 应用和个体的总体设计](https://pushyzheng.com/posts/tech/h5-斗地主游戏后端教程一/)
 
-[H5斗地主游戏应用后台教程（二）—— 算法模块的实现](https://pushy.site/2019/02/21/landroad-backend-2/)
+[H5斗地主游戏应用后台教程（二）—— 算法模块的实现](https://pushyzheng.com/posts/tech/h5-斗地主游戏后端教程二/)
 
-[H5斗地主游戏应用后台教程（三）—— 业务模块的实现](https://pushy.site/2019/02/21/landroad-backend-3/)
+[H5斗地主游戏应用后台教程（三）—— 业务模块的实现](https://pushyzheng.com/posts/tech/h5-斗地主游戏后端教程三/)
 
 ## 贡献者
 
