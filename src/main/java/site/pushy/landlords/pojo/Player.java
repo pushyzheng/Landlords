@@ -15,17 +15,35 @@ import java.util.List;
 @Data
 public class Player implements Comparable<Player> {
 
-    private Integer id;             // 玩家在当前房间的座位顺序
+    /**
+     * 玩家在当前房间的座位顺序
+     */
+    private Integer id;
 
-    private IdentityEnum identity;  // 当前局的身份（地主、农民）
+    /**
+     * 当前局的身份（地主、农民）
+     */
+    private IdentityEnum identity;
 
-    private List<Card> cards;       // 玩家当前手中的牌
+    /**
+     * 玩家当前手中的牌
+     */
+    private List<Card> cards;
 
-    private List<Card> recentCards; // 玩家最近出的牌列表
+    /**
+     * 玩家最近出的牌列表
+     */
+    private List<Card> recentCards;
 
-    private User user;              // 玩家的用户对象
+    /**
+     * 玩家的用户对象
+     */
+    private User user;
 
-    private boolean ready;          // 玩家是否准备
+    /**
+     * 玩家是否准备
+     */
+    private boolean ready;
 
     public Player() {
         cards = new ArrayList<>();
@@ -47,7 +65,6 @@ public class Player implements Comparable<Player> {
 
     /**
      * 获取当前玩家的下一家id
-     * @return
      */
     public int getNextPlayerId() {
         return id == 3 ? 1 : id + 1;
@@ -84,5 +101,4 @@ public class Player implements Comparable<Player> {
     public int compareTo(Player other) {
         return Integer.compare(id, other.id);
     }
-
 }

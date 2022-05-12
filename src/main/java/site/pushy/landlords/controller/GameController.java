@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.common.util.RespEntity;
-import site.pushy.landlords.core.CardUtil;
-import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.BidDTO;
@@ -41,11 +39,11 @@ public class GameController {
     @PostMapping("/ready")
     public String readyGame(@SessionAttribute User curUser,
                             @Valid @RequestBody ReadyGameDTO readyGameDTO) {
-        boolean start = gameService.readyGame(curUser);
-        if (start) {
+        boolean isAllReady = gameService.readyGame(curUser);
+        if (isAllReady) {
             gameService.startGame(readyGameDTO.getRoomId());
         }
-        return RespEntity.success(start);
+        return RespEntity.success(isAllReady);
     }
 
     /**

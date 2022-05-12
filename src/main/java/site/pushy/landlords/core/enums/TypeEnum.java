@@ -18,12 +18,12 @@ public enum TypeEnum {
     STRAIGHT("顺子"),
     STRAIGHT_PAIR("连对"),
 
-    AIRCRAFT_WITH_WINGS("飞机带翅膀"),
     AIRCRAFT("飞机"),
+    AIRCRAFT_WITH_WINGS("飞机带翅膀"),
 
     FOUR_WITH_TWO("四带二");
 
-    private String name;
+    private final String name;
 
     TypeEnum(String name) {
         this.name = name;

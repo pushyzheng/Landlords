@@ -14,19 +14,30 @@ import java.util.Objects;
 @Data
 public class Card implements Comparable<Card> {
 
-    // 牌的数字ID
+    /**
+     * 牌的数字ID
+     */
     private int id;
 
-    // 牌的类型
+    /**
+     * 牌的类型
+     */
     private CardTypeEnum type;
 
-    // 牌的数值
+    /**
+     * 牌的数值
+     */
     private CardNumberEnum number;
 
-    // 牌的等级，和数值差别在于，A和2数值虽然比3~K小，但是等级却比3高
+    /**
+     * 牌的等级
+     * <p>
+     * 和数值差别在于A和2数值虽然比3~K小，但是等级却比3高
+     */
     private CardGradeEnum grade;
 
-    public Card() { }
+    public Card() {
+    }
 
     public Card(CardGradeEnum grade) {
         this.grade = grade;
@@ -59,16 +70,18 @@ public class Card implements Comparable<Card> {
 
     /**
      * 实现牌比大小的方法，可提供给卡牌数组排序使用
+     *
      * @param o 另一张对比的牌
      */
     @Override
     public int compareTo(Card o) {
 //        return Integer.compare(this.getNumberValue(), o.getNumberValue());
-        return - Integer.compare(this.getGradeValue(), o.getGradeValue());
+        return -Integer.compare(this.getGradeValue(), o.getGradeValue());
     }
 
     /**
      * 两张牌等级比较方法
+     *
      * @param o 另一张对比的牌
      */
     public int compareGradeTo(Card o) {
@@ -83,6 +96,7 @@ public class Card implements Comparable<Card> {
 
     /**
      * 实现两张牌是否相等
+     *
      * @param o 另一张对比的牌
      */
     @Override

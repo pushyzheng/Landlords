@@ -32,7 +32,7 @@ public enum CardGradeEnum {
     FOURTEENTH(14),
     FIFTEENTH(15);
 
-    private int value;
+    private final int value;
 
     CardGradeEnum(int value) {
         this.value = value;
@@ -41,10 +41,4 @@ public enum CardGradeEnum {
     public int getValue() {
         return value;
     }
-
-    public static List<CardGradeEnum> getIllegalGradeOfStraight() {
-        return Arrays.asList(THIRTEENTH, FOURTEENTH, FIFTEENTH);
-    }
-
-
 }

@@ -16,6 +16,7 @@ public interface GameService {
 
     /**
      * 玩家准备游戏
+     *
      * @return 是否开局，当房间的内的所有玩家都准备，并且人数已满3人，即为开局
      */
     boolean readyGame(User user);

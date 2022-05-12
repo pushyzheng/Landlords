@@ -3,13 +3,19 @@ package site.pushy.landlords.core;
 import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * @author Pushy
  * @since 2018/12/29 15:52
  */
-public class CardUtil {
+public class CardUtils {
+
+    /**
+     * 用于排序的比较器，让牌列表能够按照等级从小到大的排列
+     */
+    private static final Comparator<Card> CARD_COMPARATOR = Comparator.comparingInt(Card::getGradeValue);
 
     /**
      * 比较两张牌的等级值，返回1则代表card > other，-1 代表 card < other，0代表等级相同
@@ -28,8 +34,8 @@ public class CardUtil {
         return compareGrade(card, other) == 1;
     }
 
-    public static boolean compareGradeTo(int grade, int other) {
-        return grade > other;
+    public static void sortCards(List<Card> cards) {
+        cards.sort(CARD_COMPARATOR);
     }
 
     /**
@@ -37,7 +43,7 @@ public class CardUtil {
      *
      * @see TypeEnum
      */
-    public static TypeEnum getCardType(List<Card> cards) {
+    public static TypeEnum getCardsType(List<Card> cards) {
         TypeEnum type = null;
         if (cards != null && cards.size() != 0) {
             if (TypeJudgement.isSingle(cards)) {
@@ -68,5 +74,4 @@ public class CardUtil {
         }
         return type;
     }
-
 }

@@ -9,14 +9,17 @@ package site.pushy.landlords.core.enums;
 public enum CardTypeEnum {
 
     SPADE("黑桃"),
+
     HEART("红桃"),
+
     CLUB("梅花"),
+
     DIAMOND("方块"),
 
     SMALL_JOKER("小王"),
     BIG_JOKER("大王");
 
-    private String name;
+    private final String name;
 
     CardTypeEnum(String name) {
         this.name = name;

@@ -12,13 +12,30 @@ import java.util.*;
  */
 public class CardDistribution {
 
-    private List<Card> allCardList;  // 所有牌
+    /**
+     * 所有牌
+     */
+    private final List<Card> allCardList;
 
-    private List<Card> player1Cards = new Vector<>();  // 玩家1的牌
-    private List<Card> player2Cards = new Vector<>();  // 玩家2的牌
-    private List<Card> player3Cards = new Vector<>();  // 玩家3的牌
+    /**
+     * 玩家 1 的牌
+     */
+    private final List<Card> player1Cards = new ArrayList<>();
 
-    private List<Card> topCards = new Vector<>();
+    /**
+     * 玩家 2 的牌
+     */
+    private final List<Card> player2Cards = new ArrayList<>();
+
+    /**
+     * 玩家 3 的牌
+     */
+    private final List<Card> player3Cards = new ArrayList<>();
+
+    /**
+     * 底牌
+     */
+    private List<Card> topCards = new ArrayList<>();
 
     public CardDistribution() {
         allCardList = new Vector<>();
@@ -103,6 +120,7 @@ public class CardDistribution {
 
     /**
      * 获取对应玩家该局的牌
+     *
      * @param number 玩家在房间中的序号
      */
     public List<Card> getCards(int number) {

@@ -2,13 +2,11 @@ package site.pushy.landlords.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.core.CardDistribution;
-import site.pushy.landlords.core.CardUtil;
+import site.pushy.landlords.core.CardUtils;
 import site.pushy.landlords.core.GradeComparison;
-import site.pushy.landlords.core.TypeJudgement;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.IdentityEnum;
@@ -23,6 +21,7 @@ import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.pojo.ws.*;
 import site.pushy.landlords.service.GameService;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -32,43 +31,27 @@ import java.util.List;
 @Service
 public class GameServiceImpl implements GameService {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
-    @Autowired
+    @Resource
     private NotifyComponent notifyComponent;
 
     @Override
     public boolean readyGame(User user) {
         Room room = roomComponent.getUserRoom(user.getId());
+        // 更改玩家的准备状态
+        Player player = room.getPlayerByUserId(user.getId());
+        player.setReady(true);
 
-        /* 更改玩家的准备状态 */
-        List<Player> playerList = room.getPlayerList();
-        for (Player player : playerList) {
-            if (player.getUser().getId().equals(user.getId())) {
-                player.setReady(true);
-            }
-        }
-        room.setPlayerList(playerList);
         roomComponent.updateRoom(room);
+        // 玩家准备通知
+        notifyComponent.sendToAllUserOfRoom(room.getId(), new ReadyGameMessage(user.getId()));
 
-        /* 检查是否房间内的人数等于3人，并且全部都处于准备中的状态 */
-        boolean res = true;
-        if (playerList.size() != 3) {
-            res = false;
-        } else {
-            for (Player player : room.getPlayerList()) {
-                if (!player.isReady()) {  // 当房间内有某一个用户没有准备，则说明没有开局
-                    res = false;
-                }
-            }
-        }
-
-        Message readyGameMessage = new ReadyGameMessage(user.getId());  // 玩家准备通知
-        notifyComponent.sendToAllUserOfRoom(room.getId(), readyGameMessage);
-        return res;
+        // 检查是否房间内的人数等于3人，并且全部都处于准备中的状态
+        return isAllReady(room, room.getPlayerList());
     }
 
     @Override
@@ -78,8 +61,8 @@ public class GameServiceImpl implements GameService {
         player.setReady(false);
 
         roomComponent.updateRoom(room);
-        Message readyGameMessage = new UnReadyGameMessage(curUser.getId());  // 取消准备通知
-        notifyComponent.sendToAllUserOfRoom(room.getId(), readyGameMessage);
+        // 取消准备通知
+        notifyComponent.sendToAllUserOfRoom(room.getId(), new UnReadyGameMessage(curUser.getId()));
     }
 
     @Override
@@ -182,19 +165,19 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RoundResult playCard(User user, List<Card> cardList) {
-        System.out.println("【" + user.getUsername() + "】" + cardList);
+        logger.info("user({}) playCard: {}", user.getUsername(), cardList);
         Room room = roomComponent.getUserRoom(user.getId());
         Player player = room.getPlayerByUserId(user.getId());
 
         /* 校验玩家出的牌是否符合斗地主规则规范 */
-        TypeEnum myType = CardUtil.getCardType(cardList);
+        TypeEnum myType = CardUtils.getCardsType(cardList);
         if (myType == null) {
             logger.info(String.format("玩家【%s】打出的牌不符合规则", user.getUsername()));
             throw new ForbiddenException("玩家打出的牌不符合规则");
         }
         if (room.getPreCards() != null && room.getPrePlayerId() != player.getId()) {
             /* 判断该玩家打出的牌是否能比上家出的牌大 */
-            TypeEnum preType = CardUtil.getCardType(room.getPreCards());
+            TypeEnum preType = CardUtils.getCardsType(room.getPreCards());
             boolean canPlay = GradeComparison.canPlayCards(cardList, myType, room.getPreCards(), preType);
             logger.info(String.format("【%s】 myType：%s，preType：%s，canPlay：%b", user.getUsername(),
                     myType.getName(), preType.getName(), canPlay));
@@ -217,8 +200,7 @@ public class GameServiceImpl implements GameService {
             logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
             result = getResult(room, player);
             room.reset();
-        }
-        else {
+        } else {
             logger.info(String.format("玩家【%s】出牌，类型为：【%s】，下一个出牌者序号为：%d", player.getUser().getUsername(),
                     myType.getName(), player.getNextPlayerId()));
             room.setPreCards(cardList);
@@ -261,4 +243,16 @@ public class GameServiceImpl implements GameService {
         nextPlayer.clearRecentCards();
     }
 
+    private boolean isAllReady(Room room, List<Player> playerList) {
+        if (playerList.size() != 3) {
+            return false;
+        }
+        for (Player player : room.getPlayerList()) {
+            if (!player.isReady()) {
+                // 当房间内有某一个用户没有准备，则说明没有开局
+                return false;
+            }
+        }
+        return true;
+    }
 }

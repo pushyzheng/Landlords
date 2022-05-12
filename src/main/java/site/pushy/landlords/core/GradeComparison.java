@@ -2,7 +2,6 @@ package site.pushy.landlords.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import site.pushy.landlords.core.enums.CardGradeEnum;
 import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class GradeComparison {
 
-    private static Logger logger = LoggerFactory.getLogger(GradeComparison.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(GradeComparison.class.getSimpleName());
 
     /**
      * 判断是否可以出牌，也就是当前玩家的牌是否比上家的大
@@ -58,19 +57,19 @@ public class GradeComparison {
         if (prevType == TypeEnum.THREE_WITH_ONE) {
             myCard = myCards.get(1);
             prevCard = prevCards.get(1);
-            return CardUtil.compareGradeTo(myCard, prevCard);
+            return CardUtils.compareGradeTo(myCard, prevCard);
         }
         /* 3带一对，只需要比较第三张牌即可 */
         else if (prevType ==TypeEnum.THREE_WITH_PAIR) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
-            return CardUtil.compareGradeTo(myCard, prevCard);
+            return CardUtils.compareGradeTo(myCard, prevCard);
         }
         /* 4带2，只需要比较第三张牌大小的等级 */
         else if (prevType == TypeEnum.FOUR_WITH_TWO) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
-            return CardUtil.compareGradeTo(myCard, prevCard);
+            return CardUtils.compareGradeTo(myCard, prevCard);
         }
         /* 顺子、连对一样，只需要比较最大的一张牌的大小 */
         else if (prevType == TypeEnum.STRAIGHT || prevType == TypeEnum.STRAIGHT_PAIR) {
@@ -79,7 +78,7 @@ public class GradeComparison {
             }
             myCard = myCards.get(mySize - 1);
             prevCard = prevCards.get(prevSize - 1);
-            return CardUtil.compareGradeTo(myCard, prevCard);
+            return CardUtils.compareGradeTo(myCard, prevCard);
         }
         /* 飞机 */
         else if (prevType == TypeEnum.AIRCRAFT) {
@@ -89,12 +88,12 @@ public class GradeComparison {
                 // Todo 飞机判断存在问题
                 myCard = myCards.get(5);
                 prevCard = prevCards.get(5);
-                return CardUtil.compareGradeTo(myCard, prevCard);
+                return CardUtils.compareGradeTo(myCard, prevCard);
             }
         }
         /* 单张、对子、三张、炸弹等情况，都是只需要判断第一张牌大小即可 */
         else {
-            return CardUtil.compareGradeTo(myCard, prevCard);
+            return CardUtils.compareGradeTo(myCard, prevCard);
         }
     }
 
@@ -120,14 +119,4 @@ public class GradeComparison {
         Collections.sort(prevCards);
         return false;
     }
-
-    public static void main(String[] args) {
-        Card a = new Card();
-        a.setGrade(CardGradeEnum.FIRST);
-        Card b = new Card();
-        b.setGrade(CardGradeEnum.THIRD);
-
-        System.out.println(CardUtil.compareGradeTo(a, b));
-    }
-
 }
