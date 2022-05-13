@@ -8,7 +8,7 @@ import com.qq.connect.oauth.Oauth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import site.pushy.landlords.common.config.LandlordsProperties;
+import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.JWTUtil;

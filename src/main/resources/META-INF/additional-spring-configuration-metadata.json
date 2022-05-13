@@ -9,6 +9,26 @@
       "name": "landlords.frontend-host",
       "type": "java.lang.String",
       "description": "Description for landlords.frontend-host."
+    },
+    {
+      "name": "database.engine",
+      "type": "java.lang.String",
+      "description": "Description for database.engine."
+    },
+    {
+      "name": "database.url",
+      "type": "java.lang.String",
+      "description": "Description for database.url."
+    },
+    {
+      "name": "database.username",
+      "type": "java.lang.String",
+      "description": "Description for database.username."
+    },
+    {
+      "name": "database.password",
+      "type": "java.lang.String",
+      "description": "Description for database.password."
     }
   ]
 }

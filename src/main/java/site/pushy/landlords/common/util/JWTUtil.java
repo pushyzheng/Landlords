@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import site.pushy.landlords.common.config.LandlordsProperties;
+import site.pushy.landlords.common.config.properties.LandlordsProperties;
 
 import java.util.Calendar;
 import java.util.Date;

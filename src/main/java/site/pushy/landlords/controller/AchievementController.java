@@ -24,5 +24,4 @@ public class AchievementController {
     public String getAchievementByUserId(@PathVariable String userId) {
         return RespEntity.success(achievementService.getAchievementByUserId(userId));
     }
-
 }
