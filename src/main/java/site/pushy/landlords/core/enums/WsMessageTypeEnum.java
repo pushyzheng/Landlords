@@ -27,6 +27,8 @@ public enum WsMessageTypeEnum {
 
     GAME_END("游戏结束"),
 
+    CHAT("聊天消息"),
+
     PONG("心跳检测");
 
     private final String value;

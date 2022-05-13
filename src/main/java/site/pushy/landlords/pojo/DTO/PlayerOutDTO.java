@@ -39,9 +39,7 @@ public class PlayerOutDTO {
         cardSize = player.getCards().size();
         identity = player.getIdentity();
         ready = player.isReady();
-        user = new UserOutDTO(player.getUser());
+        user = UserOutDTO.fromUser(player.getUser());
         recentCards = player.getRecentCards();
     }
-
-
 }

@@ -36,7 +36,7 @@ public class RoomOutDTO {
     public RoomOutDTO(Room room) {
         id = room.getId();
         title = room.getTitle();
-        owner = new UserOutDTO(room.getOwner());
+        owner = UserOutDTO.fromUser(room.getOwner());
         playerList = room.getPlayerList().stream()
                 .map(PlayerOutDTO::new)
                 .collect(Collectors.toList());

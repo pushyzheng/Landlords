@@ -11,6 +11,8 @@ import site.pushy.landlords.pojo.Room;
  */
 public interface RoomService {
 
+    Room getRoomForUser(User curUser);
+
     RoomOutDTO getRoomById(User curUser, String id);
 
     Room createRoom(User curUser, String title, String password);

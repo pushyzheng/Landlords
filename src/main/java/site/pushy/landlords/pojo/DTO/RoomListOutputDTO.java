@@ -48,10 +48,10 @@ public class RoomListOutputDTO {
     public RoomListOutputDTO(Room room) {
         id = room.getId();
         title = room.getTitle();
-        owner = new UserOutDTO(room.getOwner());
+        owner = UserOutDTO.fromUser(room.getOwner());
         locked = room.isLocked();
         userList = room.getUserList().stream()
-                .map(UserOutDTO::new)
+                .map(UserOutDTO::fromUser)
                 .collect(Collectors.toList());
         status = room.getStatus();
     }

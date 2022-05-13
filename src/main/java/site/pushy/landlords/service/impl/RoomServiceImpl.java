@@ -30,6 +30,11 @@ public class RoomServiceImpl implements RoomService {
     private NotifyComponent notifyComponent;
 
     @Override
+    public Room getRoomForUser(User curUser) {
+        return roomComponent.getUserRoom(curUser.getId());
+    }
+
+    @Override
     public RoomOutDTO getRoomById(User curUser, String id) {
         Room room = roomComponent.getRoom(id);
         boolean canRead = false;
@@ -39,7 +44,7 @@ public class RoomServiceImpl implements RoomService {
                 break;
             }
         }
-        if (!canRead){
+        if (!canRead) {
             throw new ForbiddenException("你无权查看本房间的信息");
         }
         return new RoomOutDTO(room);

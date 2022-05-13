@@ -1,34 +1,34 @@
 package site.pushy.landlords.core.component;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import site.pushy.landlords.common.handler.WebSocketPushHandler;
-import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.ws.Message;
 
+import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * 通知模块, 通过 WebSocket 实时地给房间内的客户端推送消息
+ *
  * @author Pushy
  * @since 2019/1/2 20:11
  */
 @Component
 public class NotifyComponent {
 
-    @Autowired
+    @Resource
     private WebSocketPushHandler webSocketHandler;
 
-    @Autowired
+    @Resource
     private RoomComponent roomComponent;
 
     /**
      * 发送给某个房间所有的客户端消息
+     *
      * @return 是否发送成功，一旦一个客户端发送不成功，则视为不成功
      */
     public boolean sendToAllUserOfRoom(String roomId, String content) {
@@ -42,11 +42,12 @@ public class NotifyComponent {
 
     public boolean sendToAllUserOfRoom(String roomId, Message message) {
         String content = JSON.toJSONString(message);
-        return this.sendToAllUserOfRoom(roomId, content);
+        return sendToAllUserOfRoom(roomId, content);
     }
 
     /**
      * 发送给某个玩家的客户端消息
+     *
      * @param userId
      * @param content
      */
@@ -59,5 +60,7 @@ public class NotifyComponent {
         return webSocketHandler.sendToUser(userId, content);
     }
 
-
+    public int sendToAllUser(Message message) {
+        return webSocketHandler.sendToAllUser(JSON.toJSONString(message));
+    }
 }

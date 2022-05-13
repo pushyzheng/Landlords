@@ -1,6 +1,7 @@
 package site.pushy.landlords.common.handler;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
     /**
      * 在这个方法内来记录用户标识，从之前的WebSocketInterceptor拦截器添加的attributes中取出用户userId
      * 然后将该用户的id作为键，当前链接客户端的session作为值映射到usersMap当中
+     *
      * @author Fuxing
      */
     @Override
@@ -55,6 +57,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
     /**
      * 用户退出后的处理，当用户关闭连接后，将session关闭后，并将usersMap的session给remove掉
      * 这样用户就处于离线状态了，也不会占用系统资源
+     *
      * @author Fuxing
      */
     @Override
@@ -74,53 +77,53 @@ public class WebSocketPushHandler implements WebSocketHandler {
 
     /**
      * 给所有的用户发送消息
+     *
      * @author Pushy
      */
-    public void sendToAllUser(String content) {
+    public int sendToAllUser(String content) {
         TextMessage message = new TextMessage(content.getBytes());
 
-        for (Map.Entry<String,WebSocketSession> entry : userMap.entrySet()) {
+        int fail = 0;
+        for (Map.Entry<String, WebSocketSession> entry : userMap.entrySet()) {
             WebSocketSession session = entry.getValue();
             if (!session.isOpen()) {
-                logger.error("玩家不在线");
-            }
-            else {
+                logger.warn("sendToAllUser 玩家不在线: " + entry.getKey());
+            } else {
                 try {
                     session.sendMessage(message);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("sendToAllUser 推送消息异常: {}", entry.getKey(), e);
                 }
             }
         }
+        return fail;
     }
 
     /**
      * 发送消息给指定的用户
+     *
      * @return 是否发送成功
      * @author Pushy
      */
     public boolean sendToUser(String userId, String content) {
-        TextMessage message = new TextMessage(content.getBytes());
         WebSocketSession session = userMap.get(userId);
-
-        if (session == null) {
+        if (session == null || !session.isOpen()) {
+            logger.warn("用户不在线: {}", userId);
             return false;
         }
+        TextMessage message = new TextMessage(content.getBytes());
         try {
-            if (!session.isOpen()) {
-                logger.error("用户不在线");
-                return false;
-            }
             session.sendMessage(message);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("推送异常, userId: {}", userId, e);
             return false;
         }
     }
 
     /**
      * 发送给列表中的用户
+     *
      * @author Pushy
      */
     public boolean sendToUsers(List<String> userIdList, String content) {
@@ -130,5 +133,4 @@ public class WebSocketPushHandler implements WebSocketHandler {
         }
         return res;
     }
-
 }
