@@ -13,7 +13,7 @@ public interface RoomService {
 
     RoomOutDTO getRoomById(User curUser, String id);
 
-    Room createRoom(User curUser, String password, String title);
+    Room createRoom(User curUser, String title, String password);
 
     String joinRoom(User curUser, RoomDTO roomDTO);
 

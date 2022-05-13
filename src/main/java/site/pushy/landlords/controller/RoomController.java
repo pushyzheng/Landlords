@@ -65,8 +65,7 @@ public class RoomController {
         if (!StringUtils.hasLength(title)) {
             throw new BadRequestException("房间名称不能为空");
         }
-        return RespEntity.success(roomService.createRoom(curUser, body.getString("password"),
-                title));
+        return RespEntity.success(roomService.createRoom(curUser, title, body.getString("password")));
     }
 
     /**

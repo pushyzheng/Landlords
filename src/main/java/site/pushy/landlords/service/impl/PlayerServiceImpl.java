@@ -52,7 +52,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public boolean isPlayerReady(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
-        if (room.getStatus() != RoomStatusEnum.PLAYING) {
+        if (room.getStatus() == RoomStatusEnum.PLAYING) {
             throw new BadRequestException("游戏已经开始");
         }
         Player player = room.getPlayerByUserId(curUser.getId());

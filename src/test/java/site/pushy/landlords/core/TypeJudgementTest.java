@@ -110,16 +110,32 @@ public class TypeJudgementTest {
 
     @Test
     public void isAircraft() {
+        // 3 3 3 4 4 4
         Assert.assertTrue(TypeJudgement.isAircraft(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND)));
 
+        // 3 3 3 4 4 5
         Assert.assertFalse(TypeJudgement.isAircraft(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, THIRD)));
-        Assert.assertFalse(TypeJudgement.isAircraft(buildCards(SIXTH, FIRST, FIRST, THIRD, THIRD, THIRD)));
+        // 3 3 3 5 5 5
+        Assert.assertFalse(TypeJudgement.isAircraft(buildCards(FIRST, FIRST, FIRST, THIRD, THIRD, THIRD)));
         // 5 5 5 7 7 7
         Assert.assertFalse(TypeJudgement.isAircraft(buildCards(THIRD, THIRD, THIRD, FIFTH, FIFTH, FIFTH)));
     }
 
     @Test
     public void isAircraftWithWing() {
+        // 3 3 3 4 4 4 8 10
+        Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, EIGHTH)));
+        // 3 3 3 4 4 4 8 8 10 10
+        Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH, EIGHTH, EIGHTH)));
+
+        // 3 3 3 4 4 4 8 8 10 J
+        Assert.assertFalse(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH, EIGHTH, NINTH)));
+        // 3 3 3 10
+        Assert.assertFalse(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, EIGHTH)));
+        // 3 3 3 5 5 5 8 10
+        Assert.assertFalse(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, THIRD, THIRD, THIRD, SIXTH, EIGHTH)));
+        // 3 3 3 4 4 4 8 8 8 8
+        Assert.assertFalse(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH, SIXTH, SIXTH)));
     }
 
     @Test

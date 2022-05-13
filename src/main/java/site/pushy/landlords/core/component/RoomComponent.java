@@ -31,7 +31,7 @@ public class RoomComponent {
      * @param user
      * @return
      */
-    public Room createRoom(User user, String roomPassword, String title) {
+    public Room createRoom(User user, String title, String roomPassword) {
         if (getUserRoomId(user.getId()) != null) {
             throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
         }

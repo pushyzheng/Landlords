@@ -4,6 +4,7 @@ import site.pushy.landlords.core.enums.CardGradeEnum;
 import site.pushy.landlords.pojo.Card;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static site.pushy.landlords.core.enums.CardGradeEnum.*;
 
@@ -15,11 +16,6 @@ public class TypeJudgement {
 
     private static final List<CardGradeEnum> ILLEGAL_GRADES_OF_STRAIGHT =
             Arrays.asList(THIRTEENTH, FOURTEENTH, FIFTEENTH);
-
-    private static boolean isEmpty(List<Card> cards) {
-        if (cards == null) return true;
-        return cards.size() == 0;
-    }
 
     /**
      * 判断是否出的牌是单牌
@@ -197,20 +193,6 @@ public class TypeJudgement {
     }
 
     /**
-     * 判断是否出的牌是飞机带翅膀
-     */
-    public static boolean isAircraftWithWing(List<Card> cards) {
-        if (isEmpty(cards) || cards.size() < 6) {
-            return false;
-        }
-        CardUtils.sortCards(cards);
-
-        // TODO:
-        System.out.println(cards);
-        return true;
-    }
-
-    /**
      * 判断是否出的牌是飞机
      */
     public static boolean isAircraft(List<Card> cards) {
@@ -231,6 +213,55 @@ public class TypeJudgement {
             // 判断当前飞机等级是否和下一个飞机的等级递增 1
             // 如果是，则符合飞机的出牌规则
             if ((cards.get(i).getGradeValue() + 1) != cards.get(i + 3).getGradeValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断是否出的牌是飞机带翅膀
+     */
+    public static boolean isAircraftWithWing(List<Card> cards) {
+        if (isEmpty(cards) || cards.size() < 6 || cards.size() % 2 != 0) {
+            return false;
+        }
+        Map<Integer, Integer> counter = new HashMap<>();
+        for (Card card : cards) {
+            counter.put(card.getGradeValue(), counter.getOrDefault(card.getGradeValue(), 0) + 1);
+        }
+        List<Integer> aircraftList = counter.entrySet().stream()
+                .filter(entry -> entry.getValue() == 3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        // 飞机要保证递增
+        if (aircraftList.isEmpty() || aircraftList.size() < 2 || !isIncremental(aircraftList)) {
+            return false;
+        }
+        // 判断翅膀是否合法, 即:
+        // 1. 要么都是双
+        // 2. 要么都是单
+        Set<Integer> wings = counter.values().stream()
+                .filter(integer -> integer != 3)
+                .collect(Collectors.toSet());
+        if (wings.size() != 1) {
+            return false;
+        }
+        int num = wings.iterator().next();
+        return num == 1 || num == 2;
+    }
+
+    private static boolean isEmpty(List<Card> cards) {
+        return cards == null || cards.size() == 0;
+    }
+
+    private static boolean isIncremental(List<Integer> cards) {
+        if (cards == null || cards.isEmpty()) {
+            return false;
+        }
+        Collections.sort(cards);
+        for (int i = 0; i < cards.size() - 1; i++) {
+            if (cards.get(i) + 1 != cards.get(i + 1)) {
                 return false;
             }
         }

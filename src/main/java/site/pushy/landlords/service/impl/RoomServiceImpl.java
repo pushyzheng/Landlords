@@ -46,8 +46,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room createRoom(User curUser, String password, String title) {
-        return roomComponent.createRoom(curUser, password, title);
+    public Room createRoom(User curUser, String title, String password) {
+        return roomComponent.createRoom(curUser, title, password);
     }
 
     @Override
