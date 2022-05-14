@@ -25,6 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         interceptorRegistration.excludePathPatterns("/login");
         interceptorRegistration.excludePathPatterns("/qqLogin");
         interceptorRegistration.excludePathPatterns("/qqLogin/callback");
+        interceptorRegistration.excludePathPatterns("/ws-test.html");
     }
 
     /**

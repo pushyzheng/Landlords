@@ -80,6 +80,11 @@ public class Room {
      */
     private int prePlayerId;
 
+    /**
+     * 上一回合玩家出牌的时间戳
+     */
+    private long prePlayTime;
+
     private CardDistribution distribution;
 
     public String getStatusValue() {

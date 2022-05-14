@@ -1,36 +1,25 @@
 package site.pushy.landlords.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import com.google.common.io.Files;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import site.pushy.landlords.common.util.RespEntity;
-import site.pushy.landlords.core.component.NotifyComponent;
-import site.pushy.landlords.pojo.DO.User;
 
-import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 
 /**
  * @author Pushy
  * @since 2019/2/10 21:14
  */
 @RestController
-@RequestMapping(value = "/test", produces = "application/json")
+@RequestMapping(value = "/test")
 public class TestController {
 
-    @Resource
-    private NotifyComponent notifyComponent;
-
-    private int num = 0;
-
-    @RequestMapping("/sendToUserMessage")
-    public String sendToUserMessage(@RequestParam String userId, String message) {
-        boolean res = notifyComponent.sendToUser(userId, message == null ? String.valueOf(num++) : message);
-        return RespEntity.success(res);
-    }
-
-    @GetMapping("/test1")
-    public String test() {
-        return RespEntity.success(new User());
+    @RequestMapping(value = "/ws-test.html", produces = "text/html")
+    public void sendToUserMessage(HttpServletResponse response) throws Exception {
+        File file = ResourceUtils.getFile("classpath:static/ws-test.html");
+        // noinspection UnstableApiUsage
+        Files.copy(file, response.getOutputStream());
     }
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import site.pushy.landlords.common.util.JWTUtil;
@@ -28,14 +29,16 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
             String token = getTokenValue(httpRequest);
-            if (token == null) return false;
+            if (!StringUtils.hasLength(token)) {
+                return false;
+            }
 
-            /* 解密token，拿到用户的userId */
+            // 解密token，拿到用户的userId
             try {
                 String userId = String.valueOf(JWTUtil.decode(token));
                 attributes.put("userId", userId);
             } catch (Exception e) {
-                logger.error("某用户webSocket连接失败");
+                logger.error("WebSocket 连接失败, token: {}", token, e);
                 return false;
             }
         }
@@ -49,7 +52,6 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
 
     private String getTokenValue(HttpServletRequest httpRequest) {
         String qs = httpRequest.getQueryString();
-        return qs.substring(6, qs.length());
+        return qs.substring(6);
     }
-
 }

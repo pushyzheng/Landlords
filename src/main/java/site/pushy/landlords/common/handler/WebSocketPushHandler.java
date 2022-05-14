@@ -43,6 +43,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> message) throws Exception {
         String payload = (String) message.getPayload();
+        logger.info("handleMessage, payload: {}", payload);
         if (payload.equals("ping")) {
             String respContent = JSON.toJSONString(new PongMessage());
             webSocketSession.sendMessage(new TextMessage(respContent));
