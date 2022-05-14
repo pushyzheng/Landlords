@@ -27,11 +27,6 @@ public interface GameService {
     void unReadyGame(User curUser);
 
     /**
-     * 通知所有房间内的玩家开始游戏，并更新房间的状态
-     */
-    void startGame(String roomId);
-
-    /**
      * 叫牌，并分配该玩家该地主身份，并将三张地主加入到该玩家的牌中
      */
     void want(User user, int score);
@@ -50,5 +45,4 @@ public interface GameService {
      * 要不起
      */
     void pass(User user);
-
 }

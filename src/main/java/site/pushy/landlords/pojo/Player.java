@@ -99,6 +99,14 @@ public class Player implements Comparable<Player> {
         recentCards.clear();
     }
 
+    public boolean isLandlord() {
+        return getIdentity() == IdentityEnum.LANDLORD;
+    }
+
+    public boolean isFarmer() {
+        return getIdentity() == IdentityEnum.FARMER;
+    }
+
     @Override
     public int compareTo(Player other) {
         return Integer.compare(id, other.id);

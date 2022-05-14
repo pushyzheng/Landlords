@@ -51,7 +51,11 @@ public class GameServiceImpl implements GameService {
         notifyComponent.sendToAllUserOfRoom(room.getId(), new ReadyGameMessage(user.getId()));
 
         // 检查是否房间内的人数等于3人，并且全部都处于准备中的状态
-        return isAllReady(room, room.getPlayerList());
+        boolean isAllReady = room.isAllReady();
+        if (isAllReady) {
+            startGame(room.getId());
+        }
+        return isAllReady;
     }
 
     @Override
@@ -63,40 +67,6 @@ public class GameServiceImpl implements GameService {
         roomComponent.updateRoom(room);
         // 取消准备通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), new UnReadyGameMessage(curUser.getId()));
-    }
-
-    @Override
-    public void startGame(String roomId) {
-        Room room = roomComponent.getRoom(roomId);
-        room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
-
-        // TODO: concurrent problem
-        /* 构造 CardDistribution类，进行发牌 */
-        room.setDistribution(new CardDistribution());
-        CardDistribution distribution = room.getDistribution();
-        distribution.refresh();  // 洗牌
-
-        List<Player> playerList = room.getPlayerList();
-        for (Player player : playerList) {
-            List<Card> cards = distribution.getCards(player.getId());
-            player.setCards(cards);
-            player.setReady(false);
-        }
-        /* 通知房间内所有的玩家客户端开始游戏 */
-        notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
-
-        /* 在分牌之后随机分牌一个玩家进行叫地主 */
-        int order = (int) (1 + Math.random() * (3 - 1 + 1));  //从1到3的int型随机数
-        room.setBiddingPlayer(order);
-        for (Player player : room.getPlayerList()) {
-            if (player.getId().equals(order)) {
-                // 通知被选择叫牌的玩家客户端开始叫牌
-                logger.info(String.format("【%s】通知玩家 %s 叫牌", room.getId(), player.getUser().getUsername()));
-                notifyComponent.sendToUser(player.getUser().getId(), new BidMessage());
-                break;
-            }
-        }
-        roomComponent.updateRoom(room);
     }
 
     @Override
@@ -120,12 +90,11 @@ public class GameServiceImpl implements GameService {
         }
         roomComponent.updateRoom(room);
         notifyComponent.sendToAllUserOfRoom(room.getId(), new BidEndMessage()); // 叫牌结束
-        // 通知地主玩家出牌
-        if (landlordUser != null) {
-            notifyComponent.sendToUser(landlordUser.getId(), new PleasePlayCardMessage());
+        if (landlordUser == null) {
+            throw new IllegalStateException("选取的地主玩家不能为空");
         }
-        logger.info(String.format("【%s】 玩家【%s】成为地主", room.getId(),
-                landlordUser != null ? landlordUser.getUsername() : null));
+        notifyComponent.sendToUser(landlordUser.getId(), new PleasePlayCardMessage());
+        logger.info(String.format("【%s】 玩家【%s】成为地主", room.getId(), landlordUser.getUsername()));
     }
 
     @Override
@@ -198,6 +167,9 @@ public class GameServiceImpl implements GameService {
         }
         RoundResult result = null;
         if (player.getCards().size() == 0) { // 判断该玩家已经出完牌
+            if (isSpring(room, player)) {
+                room.doubleMultiple();
+            }
             logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
             result = getResult(room, player);
             room.reset();
@@ -210,6 +182,7 @@ public class GameServiceImpl implements GameService {
             User nextUser = room.getUserByPlayerId(player.getNextPlayerId());  // 通知下一个玩家出牌
             notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
         }
+        room.setPrePlayTime(System.currentTimeMillis());
         roomComponent.updateRoom(room);
         return result;
     }
@@ -229,6 +202,53 @@ public class GameServiceImpl implements GameService {
         notifyComponent.sendToAllUserOfRoom(room.getId(), new PassMessage(user));
     }
 
+    public void startGame(String roomId) {
+        Room room = roomComponent.getRoom(roomId);
+        room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
+
+        // TODO: concurrent problem
+        // 构造 CardDistribution类，进行发牌
+        room.setDistribution(new CardDistribution());
+        CardDistribution distribution = room.getDistribution();
+        distribution.refresh();  // 洗牌
+
+        List<Player> playerList = room.getPlayerList();
+        for (Player player : playerList) {
+            List<Card> cards = distribution.getCards(player.getId());
+            player.setCards(cards);
+            player.setReady(false);
+        }
+        // 通知房间内所有的玩家客户端开始游戏
+        notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
+
+        // 在分牌之后随机分牌一个玩家进行叫地主
+        int order = (int) (1 + Math.random() * (3 - 1 + 1));  //从1到3的int型随机数
+        room.setBiddingPlayer(order);
+        for (Player player : room.getPlayerList()) {
+            if (player.getId().equals(order)) {
+                // 通知被选择叫牌的玩家客户端开始叫牌
+                logger.info(String.format("【%s】通知玩家 %s 叫牌", room.getId(), player.getUser().getUsername()));
+                notifyComponent.sendToUser(player.getUser().getId(), new BidMessage());
+                break;
+            }
+        }
+        roomComponent.updateRoom(room);
+    }
+
+    /**
+     * 春天判断:
+     * <p>
+     * 1. 如果是农民, 地主剩 20 张牌
+     * 2. 如果是地主, 则两个农民都必须剩 17 张牌
+     */
+    private boolean isSpring(Room room, Player winner) {
+        if (winner.isLandlord()) {
+            return room.getFarmers().stream().map(s -> s.getCards().size()).allMatch(s -> s == 17);
+        } else {
+            return room.getLandlord().getCards().size() == 20;
+        }
+    }
+
     private RoundResult getResult(Room room, Player player) {
         RoundResult result = new RoundResult(player.getIdentity(), room.getMultiple());
         for (Player each : room.getPlayerList()) {
@@ -242,18 +262,5 @@ public class GameServiceImpl implements GameService {
     private void removeNextPlayerRecentCards(Room room, Player player) {
         Player nextPlayer = room.getPlayerById(player.getNextPlayerId());
         nextPlayer.clearRecentCards();
-    }
-
-    private boolean isAllReady(Room room, List<Player> playerList) {
-        if (playerList.size() != 3) {
-            return false;
-        }
-        for (Player player : room.getPlayerList()) {
-            if (!player.isReady()) {
-                // 当房间内有某一个用户没有准备，则说明没有开局
-                return false;
-            }
-        }
-        return true;
     }
 }

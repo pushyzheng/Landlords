@@ -17,34 +17,65 @@ import java.util.stream.Collectors;
 @Data
 public class RoomOutDTO {
 
-    private String id;                      // 房间号
+    /**
+     * 房间号
+     */
+    private String id;
 
+    /**
+     * 房间标题
+     */
     private String title;
 
+    /**
+     * 房主
+     */
     private UserOutDTO owner;
 
-    private List<PlayerOutDTO> playerList;  // 当前玩家列表
+    /**
+     * 当前玩家列表
+     */
+    private List<PlayerOutDTO> playerList;
 
-    private RoomStatusEnum status;          // 房间的状态
+    /**
+     * 房间的状态
+     */
+    private RoomStatusEnum status;
 
-    private int multiple;                   // 房间底分
+    /**
+     * 房间底分
+     */
+    private int multiple;
 
-    private List<Card> topCards;            // 三张底牌
+    /**
+     * 三张底牌
+     */
+    private List<Card> topCards;
 
-    private int stepNum;              // 每局走的步数，用来控制玩家的出牌回合
+    /**
+     * 每局走的步数，用来控制玩家的出牌回合
+     */
+    private int stepNum;
 
-    public RoomOutDTO(Room room) {
-        id = room.getId();
-        title = room.getTitle();
-        owner = UserOutDTO.fromUser(room.getOwner());
-        playerList = room.getPlayerList().stream()
+    /**
+     * 计时器
+     */
+    private int countdown;
+
+    public static RoomOutDTO fromRoom(Room room) {
+        RoomOutDTO roomOutDTO = new RoomOutDTO();
+        roomOutDTO.id = room.getId();
+        roomOutDTO.title = room.getTitle();
+        roomOutDTO.owner = UserOutDTO.fromUser(room.getOwner());
+        roomOutDTO.playerList = room.getPlayerList().stream()
                 .map(PlayerOutDTO::new)
                 .collect(Collectors.toList());
-        status = room.getStatus();
-        multiple = room.getMultiple();
+        roomOutDTO.status = room.getStatus();
+        roomOutDTO.multiple = room.getMultiple();
         if (room.getDistribution() != null) {
-            topCards = room.getDistribution().getTopCards();
+            roomOutDTO.topCards = room.getDistribution().getTopCards();
         }
-        stepNum = room.getStepNum();
+        roomOutDTO.stepNum = room.getStepNum();
+        return roomOutDTO;
     }
 }

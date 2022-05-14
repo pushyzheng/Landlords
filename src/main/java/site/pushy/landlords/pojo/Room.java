@@ -2,11 +2,13 @@ package site.pushy.landlords.pojo;
 
 import lombok.Data;
 import site.pushy.landlords.core.CardDistribution;
+import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Pushy
@@ -117,10 +119,22 @@ public class Room {
         this.prePlayerId = 0;
         this.stepNum = -1;
         this.biddingPlayer = -1;
+        this.prePlayTime = 0;
         // 初始化Player对象的值
         for (Player player : playerList) {
             player.reset();
         }
+    }
+
+    public Player getLandlord() {
+        return getPlayerList().stream().filter(Player::isLandlord)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("地主玩家不存在"));
+    }
+
+    public List<Player> getFarmers() {
+        return getPlayerList().stream().filter(Player::isFarmer)
+                .collect(Collectors.toList());
     }
 
     public void addPlayer(Player player) {
@@ -154,8 +168,11 @@ public class Room {
     }
 
     public void incrBiddingPlayer() {
-        if (biddingPlayer == 3) biddingPlayer = 1;
-        else biddingPlayer++;
+        if (biddingPlayer == 3) {
+            biddingPlayer = 1;
+        } else {
+            biddingPlayer++;
+        }
     }
 
     public void doubleMultiple() {
@@ -192,4 +209,16 @@ public class Room {
         return player.getUser();
     }
 
+    public boolean isAllReady() {
+        if (getPlayerList().size() != 3) {
+            return false;
+        }
+        for (Player player : getPlayerList()) {
+            if (!player.isReady()) {
+                // 当房间内有某一个用户没有准备，则说明没有开局
+                return false;
+            }
+        }
+        return true;
+    }
 }

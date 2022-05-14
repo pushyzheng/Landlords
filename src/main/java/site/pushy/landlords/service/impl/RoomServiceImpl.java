@@ -1,6 +1,7 @@
 package site.pushy.landlords.service.impl;
 
 import org.springframework.stereotype.Service;
+import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
@@ -9,7 +10,6 @@ import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
 import site.pushy.landlords.pojo.DTO.RoomOutDTO;
 import site.pushy.landlords.pojo.Room;
-import site.pushy.landlords.pojo.ws.Message;
 import site.pushy.landlords.pojo.ws.PlayerExitMessage;
 import site.pushy.landlords.pojo.ws.PlayerJoinMessage;
 import site.pushy.landlords.service.RoomService;
@@ -29,6 +29,9 @@ public class RoomServiceImpl implements RoomService {
     @Resource
     private NotifyComponent notifyComponent;
 
+    @Resource
+    private LandlordsProperties landlordsProperties;
+
     @Override
     public Room getRoomForUser(User curUser) {
         return roomComponent.getUserRoom(curUser.getId());
@@ -37,17 +40,12 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RoomOutDTO getRoomById(User curUser, String id) {
         Room room = roomComponent.getRoom(id);
-        boolean canRead = false;
-        for (User user : room.getUserList()) {
-            if (curUser.getId().equals(user.getId())) {
-                canRead = true;
-                break;
-            }
-        }
-        if (!canRead) {
+        if (!canVisit(curUser, room)) {
             throw new ForbiddenException("你无权查看本房间的信息");
         }
-        return new RoomOutDTO(room);
+        RoomOutDTO result = RoomOutDTO.fromRoom(room);
+        setCountdown(room, result);
+        return result;
     }
 
     @Override
@@ -79,5 +77,27 @@ public class RoomServiceImpl implements RoomService {
             notifyComponent.sendToAllUserOfRoom(room.getId(), new PlayerExitMessage(curUser));
         }
         return hasRemove;
+    }
+
+    private void setCountdown(Room room, RoomOutDTO result) {
+        if (room.getPrePlayTime() == 0) {  // 尚未出过牌
+            result.setCountdown(-1);
+            return;
+        }
+        long gap = System.currentTimeMillis() - room.getPrePlayTime();
+        if (gap >= landlordsProperties.getMaxSecondsForEveryRound()) {
+            result.setCountdown(0);
+        } else {
+            result.setCountdown((int) gap);
+        }
+    }
+
+    private boolean canVisit(User curUser, Room room) {
+        for (User user : room.getUserList()) {
+            if (curUser.getId().equals(user.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

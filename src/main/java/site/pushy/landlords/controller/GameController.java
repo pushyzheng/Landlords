@@ -37,13 +37,8 @@ public class GameController {
      * 准备
      */
     @PostMapping("/ready")
-    public String readyGame(@SessionAttribute User curUser,
-                            @Valid @RequestBody ReadyGameDTO readyGameDTO) {
-        boolean isAllReady = gameService.readyGame(curUser);
-        if (isAllReady) {
-            gameService.startGame(readyGameDTO.getRoomId());
-        }
-        return RespEntity.success(isAllReady);
+    public String readyGame(@SessionAttribute User curUser) {
+        return RespEntity.success(gameService.readyGame(curUser));
     }
 
     /**
