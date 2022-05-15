@@ -15,16 +15,39 @@ import java.util.List;
 @Data
 public class PlayerOutDTO {
 
+    /**
+     * 玩家序号
+     */
     private Integer id;
 
+    /**
+     * 牌的大小
+     */
     private int cardSize;
 
+    /**
+     * 身份
+     */
     private IdentityEnum identity;
 
+    /**
+     * 最近出的牌
+     */
     private List<Card> recentCards;
 
+    /**
+     * 是否准备
+     */
     private boolean ready;
 
+    /**
+     * 是否在线
+     */
+    private boolean online;
+
+    /**
+     * 用户身份
+     */
     private UserOutDTO user;
 
     public String getIdentityName() {

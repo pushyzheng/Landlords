@@ -1,13 +1,17 @@
 package site.pushy.landlords.common.handler;
 
 import com.alibaba.fastjson.JSON;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
+import site.pushy.landlords.common.config.properties.LandlordsProperties;
+import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.ws.PongMessage;
+import site.pushy.landlords.service.RoomService;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +26,24 @@ public class WebSocketPushHandler implements WebSocketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketPushHandler.class);
 
-    private static final ConcurrentHashMap<String, WebSocketSession> userMap =
+    private static final ConcurrentHashMap<String, Connection> connections =
             new ConcurrentHashMap<>();
+
+    @Resource
+    private LandlordsProperties properties;
+
+    @Resource
+    private RoomService roomService;
+
+    @Scheduled(fixedRate = 10000)
+    public synchronized void detectOffline() {
+        logger.info("开始检测用户的心跳状态");
+        connections.forEach((userId, conn) -> {
+            if (heartBeatTimeout(conn)) {
+                handleOffline(userId);
+            }
+        });
+    }
 
     /**
      * 在这个方法内来记录用户标识，从之前的WebSocketInterceptor拦截器添加的attributes中取出用户userId
@@ -32,21 +52,20 @@ public class WebSocketPushHandler implements WebSocketHandler {
      * @author Fuxing
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         String userId = (String) session.getAttributes().get("userId");
-        userMap.put(userId, session);
+        connections.put(userId, new Connection(session));
     }
 
     /**
      * 处理客户端通过webSocket.send()发送的消息，这里用来处理心跳检测
      */
     @Override
-    public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> message) throws Exception {
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         String payload = (String) message.getPayload();
         logger.info("handleMessage, payload: {}", payload);
-        if (payload.equals("ping")) {
-            String respContent = JSON.toJSONString(new PongMessage());
-            webSocketSession.sendMessage(new TextMessage(respContent));
+        if (payload.equalsIgnoreCase("ping")) {
+            handlePing(session);
         }
     }
 
@@ -63,17 +82,20 @@ public class WebSocketPushHandler implements WebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        if (session.isOpen()) {
-            session.close();
-        }
-        String userId = (String) session.getAttributes().get("userId");
-        //logger.info(String.format("Client 【%s】 closed webSocket connection", userId));
-        userMap.remove(userId);
+        logger.info("[afterConnectionClosed] sessionId: {}, closeStatus: {}", session.getId(), closeStatus);
     }
 
     @Override
     public boolean supportsPartialMessages() {
         return false;
+    }
+
+    public boolean isOnline(String userId) {
+        if (!connections.containsKey(userId)) {
+            return false;
+        }
+        Connection conn = connections.get(userId);
+        return conn.session.isOpen();
     }
 
     /**
@@ -85,8 +107,8 @@ public class WebSocketPushHandler implements WebSocketHandler {
         TextMessage message = new TextMessage(content.getBytes());
 
         int fail = 0;
-        for (Map.Entry<String, WebSocketSession> entry : userMap.entrySet()) {
-            WebSocketSession session = entry.getValue();
+        for (Map.Entry<String, Connection> entry : connections.entrySet()) {
+            WebSocketSession session = entry.getValue().session;
             if (!session.isOpen()) {
                 logger.warn("sendToAllUser 玩家不在线: " + entry.getKey());
             } else {
@@ -107,7 +129,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
      * @author Pushy
      */
     public boolean sendToUser(String userId, String content) {
-        WebSocketSession session = userMap.get(userId);
+        WebSocketSession session = connections.get(userId).session;
         if (session == null || !session.isOpen()) {
             logger.warn("用户不在线: {}", userId);
             return false;
@@ -133,5 +155,55 @@ public class WebSocketPushHandler implements WebSocketHandler {
             res = sendToUser(userId, content);
         }
         return res;
+    }
+
+    private void handlePing(WebSocketSession session) throws IOException {
+        connections.forEach((userId, conn) -> {
+            if (conn.session.getId().equals(session.getId())) {
+                conn.lastPingTime = System.currentTimeMillis();
+            }
+        });
+        // Reply PONG message
+        String respContent = JSON.toJSONString(new PongMessage());
+        session.sendMessage(new TextMessage(respContent));
+    }
+
+    private void handleOffline(String userId) {
+        connections.remove(userId);
+        logger.info("心跳检测时间超时, 移除该用户: {}", userId);
+        try {
+            roomService.exitRoom(new User().setId(userId));
+        } catch (Exception e) {
+            // ignore the exception
+        }
+    }
+
+    private boolean heartBeatTimeout(Connection conn) {
+        return System.currentTimeMillis() - conn.lastPingTime
+                > properties.getHeartbeatTimeout().toMillis();
+    }
+
+    /**
+     * 客户端连接信息
+     */
+    private static class Connection {
+
+        WebSocketSession session;
+
+        /**
+         * 登录的时间
+         */
+        long loginTime;
+
+        /**
+         * 上一次心跳检测的时间戳
+         */
+        long lastPingTime;
+
+        public Connection(WebSocketSession session) {
+            this.session = session;
+            this.lastPingTime = System.currentTimeMillis();
+            this.loginTime = System.currentTimeMillis();
+        }
     }
 }

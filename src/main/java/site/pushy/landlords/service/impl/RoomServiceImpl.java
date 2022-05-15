@@ -3,6 +3,7 @@ package site.pushy.landlords.service.impl;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.ForbiddenException;
+import site.pushy.landlords.common.handler.WebSocketPushHandler;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
@@ -32,6 +33,9 @@ public class RoomServiceImpl implements RoomService {
     @Resource
     private LandlordsProperties landlordsProperties;
 
+    @Resource
+    private WebSocketPushHandler webSocketHandler;
+
     @Override
     public Room getRoomForUser(User curUser) {
         return roomComponent.getUserRoom(curUser.getId());
@@ -44,6 +48,8 @@ public class RoomServiceImpl implements RoomService {
             throw new ForbiddenException("你无权查看本房间的信息");
         }
         RoomOutDTO result = RoomOutDTO.fromRoom(room);
+        // 设置在线状态
+        result.getPlayerList().forEach(player -> player.setOnline(webSocketHandler.isOnline(player.getUser().getId())));
         setCountdown(room, result);
         return result;
     }
@@ -84,11 +90,12 @@ public class RoomServiceImpl implements RoomService {
             result.setCountdown(-1);
             return;
         }
-        long gap = System.currentTimeMillis() - room.getPrePlayTime();
-        if (gap >= landlordsProperties.getMaxSecondsForEveryRound()) {
+        long gap = (System.currentTimeMillis() - room.getPrePlayTime()) / 1000;
+        long countdown = landlordsProperties.getMaxSecondsForEveryRound() - gap;
+        if (countdown <= 0) {
             result.setCountdown(0);
         } else {
-            result.setCountdown((int) gap);
+            result.setCountdown((int) countdown);
         }
     }
 

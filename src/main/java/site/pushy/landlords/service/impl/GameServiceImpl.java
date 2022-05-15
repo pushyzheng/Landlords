@@ -194,6 +194,7 @@ public class GameServiceImpl implements GameService {
 
         removeNextPlayerRecentCards(room, player);
         room.incrStep();
+        room.setPrePlayTime(System.currentTimeMillis());
         roomComponent.updateRoom(room);
 
         logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getNextPlayerId()));

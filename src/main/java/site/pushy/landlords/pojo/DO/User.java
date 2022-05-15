@@ -1,6 +1,7 @@
 package site.pushy.landlords.pojo.DO;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import java.util.UUID;
  * @since 2018/12/29 20:45
  */
 @Data
+@Accessors(chain = true)
 public class User {
 
     private String id;

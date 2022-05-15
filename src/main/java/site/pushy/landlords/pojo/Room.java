@@ -1,8 +1,8 @@
 package site.pushy.landlords.pojo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import site.pushy.landlords.core.CardDistribution;
-import site.pushy.landlords.core.enums.IdentityEnum;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
 
@@ -126,12 +126,14 @@ public class Room {
         }
     }
 
+    @JSONField(serialize = false)
     public Player getLandlord() {
         return getPlayerList().stream().filter(Player::isLandlord)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("地主玩家不存在"));
     }
 
+    @JSONField(serialize = false)
     public List<Player> getFarmers() {
         return getPlayerList().stream().filter(Player::isFarmer)
                 .collect(Collectors.toList());
