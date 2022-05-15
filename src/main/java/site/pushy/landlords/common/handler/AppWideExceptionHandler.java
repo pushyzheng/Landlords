@@ -101,7 +101,4 @@ public class AppWideExceptionHandler {
         }
         return RespEntity.error(status.value(), message);
     }
-
-
-
 }

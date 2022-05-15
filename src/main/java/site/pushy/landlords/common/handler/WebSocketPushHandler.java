@@ -9,6 +9,7 @@ import org.springframework.web.socket.*;
 import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.ws.PongMessage;
+import site.pushy.landlords.service.MetricsService;
 import site.pushy.landlords.service.RoomService;
 
 import javax.annotation.Resource;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Fuxing
@@ -35,14 +38,21 @@ public class WebSocketPushHandler implements WebSocketHandler {
     @Resource
     private RoomService roomService;
 
+    @Resource
+    private MetricsService metricsService;
+
     @Scheduled(fixedRate = 10000)
     public synchronized void detectOffline() {
         logger.info("开始检测用户的心跳状态");
+        AtomicInteger onlineNum = new AtomicInteger();
         connections.forEach((userId, conn) -> {
             if (heartBeatTimeout(conn)) {
                 handleOffline(userId);
+            } else {
+                onlineNum.incrementAndGet();
             }
         });
+        metricsService.recordOnlineNum(onlineNum.get());
     }
 
     /**
@@ -53,6 +63,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        metricsService.recordWebSocketEvent("established");
         String userId = (String) session.getAttributes().get("userId");
         connections.put(userId, new Connection(session));
     }
@@ -65,6 +76,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
         String payload = (String) message.getPayload();
         logger.info("handleMessage, payload: {}", payload);
         if (payload.equalsIgnoreCase("ping")) {
+            metricsService.recordWebSocketEvent("pong");
             handlePing(session);
         }
     }
@@ -83,6 +95,9 @@ public class WebSocketPushHandler implements WebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         logger.info("[afterConnectionClosed] sessionId: {}, closeStatus: {}", session.getId(), closeStatus);
+        if (closeStatus.getCode() == CloseStatus.GOING_AWAY.getCode()) {
+            metricsService.recordWebSocketEvent("closed");
+        }
     }
 
     @Override

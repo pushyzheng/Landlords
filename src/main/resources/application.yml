@@ -1,6 +1,17 @@
 spring:
+  application:
+    name: landlords
   profiles:
     active: dev
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: site.pushy.landlords.pojo.DO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}
