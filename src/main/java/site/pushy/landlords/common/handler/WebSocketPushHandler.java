@@ -129,8 +129,9 @@ public class WebSocketPushHandler implements WebSocketHandler {
      * @author Pushy
      */
     public boolean sendToUser(String userId, String content) {
-        WebSocketSession session = connections.get(userId).session;
-        if (session == null || !session.isOpen()) {
+        Connection conn = connections.get(userId);
+        WebSocketSession session;
+        if (conn == null || (session = conn.session) == null || !session.isOpen()) {
             logger.warn("用户不在线: {}", userId);
             return false;
         }

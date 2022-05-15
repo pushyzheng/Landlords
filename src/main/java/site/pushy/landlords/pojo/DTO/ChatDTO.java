@@ -14,6 +14,11 @@ public class ChatDTO {
     private String content;
 
     /**
+     * 预设的类型, 为 0 的话则不是预设消息
+     */
+    private int type;
+
+    /**
      * 广播的维度
      */
     @NotBlank

@@ -21,6 +21,11 @@ public class ChatMessage extends Message {
      */
     private String content;
 
+    /**
+     * 预设类型 ID
+     */
+    private int typeId;
+
     private String dimension;
 
     /**

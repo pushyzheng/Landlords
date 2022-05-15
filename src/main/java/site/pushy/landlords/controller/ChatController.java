@@ -37,6 +37,7 @@ public class ChatController {
     @PostMapping
     public String chat(@SessionAttribute User curUser, @Valid @RequestBody ChatDTO body) {
         ChatMessage message = new ChatMessage(body.getContent());
+        message.setTypeId(body.getType());
         message.setSender(UserOutDTO.fromUser(curUser));
         message.setDimension(body.getDimension());
 

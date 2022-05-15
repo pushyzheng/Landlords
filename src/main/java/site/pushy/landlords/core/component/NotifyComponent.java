@@ -8,8 +8,9 @@ import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.ws.Message;
 
 import javax.annotation.Resource;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 通知模块, 通过 WebSocket 实时地给房间内的客户端推送消息
@@ -33,10 +34,10 @@ public class NotifyComponent {
      */
     public boolean sendToAllUserOfRoom(String roomId, String content) {
         Room room = roomComponent.getRoom(roomId);
-        List<String> userIdList = new LinkedList<>();
-        for (User user : room.getUserList()) {
-            userIdList.add(user.getId());
-        }
+        List<String> userIdList = room.getUserList().stream()
+                .filter(Objects::nonNull)
+                .map(User::getId)
+                .collect(Collectors.toList());
         return webSocketHandler.sendToUsers(userIdList, content);
     }
 

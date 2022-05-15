@@ -69,72 +69,50 @@ public class RoomComponent {
         Room room = roomMap.get(id);
         //检查房间是否存在
         if (room == null) {
-            //房间不存在,返回消息
             throw new NotFoundException("该房间不存在，请核实您输入的房间号!");
-        } else {
-            //判断用户是否已经在房间内
-            if (room.getUserList().contains(user)) {
-                throw new ForbiddenException("您已经加入此房间，无法重复加入");
-            } else {
-                //检查房间中人数是否小于三人
-                int roomsize = room.getPlayerList().size();
-                if (roomsize >= 3) {
-                    //房间人数大于三人不能加入,返回消息
-                    throw new ForbiddenException("该房间已满，请寻找其他房间!");
-                } else {
-                    //房间人数小于三人可以加入
-                    if (room.isLocked()) {
-                        if (roomPassword == null)
-                            throw new ForbiddenException("对不起，您输入的房间密码有误!");
-                        //有密码
-                        if (roomPassword.equals(room.getPassword())) {
-                            //分配座位顺序
-                            Player player = new Player();
-                            List<Player> playerlist = room.getPlayerList();
-                            List<Integer> idList = new ArrayList();
-                            if (playerlist.size() == 1) {
-                                Player player0 = playerlist.get(0);
-                                int id0 = player0.getId();
-                                idList.add(id0);
-                            } else {
-                                Player player0 = playerlist.get(0);
-                                Player player1 = playerlist.get(1);
-                                int id0 = player0.getId();
-                                int id1 = player1.getId();
-                                idList.add(id0);
-                                idList.add(id1);
-                            }
-                            if (!idList.contains(1)) {
-                                player.setId(1);
-                            } else if (!idList.contains(2)) {
-                                player.setId(2);
-                            } else {
-                                player.setId(3);
-                            }
-                            player.setUser(user);
-                            room.getUserList().add(user);
-                            room.getPlayerList().add(player);
-
-                            setUserRoom(user.getId(), room.getId());
-                            return "加入成功!";
-
-                        } else {
-                            //密码错误,返回消息
-                            throw new ForbiddenException("对不起，您输入的房间密码有误!");
-                        }
-
-                    } else {
-                        //没密码
-                        Player player = new Player();
-                        room.getUserList().add(user);
-                        room.getPlayerList().add(player);
-                        return "加入成功!";
-                    }
-                }
-            }
-
         }
+        //判断用户是否已经在房间内
+        if (room.getUserList().contains(user)) {
+            throw new ForbiddenException("您已经加入此房间，无法重复加入");
+        }
+        //检查房间中人数是否小于三人
+        if (room.getPlayerList().size() >= 3) {
+            //房间人数大于三人不能加入,返回消息
+            throw new ForbiddenException("该房间已满，请寻找其他房间!");
+        }
+        // 如果房间加锁, 检查密码是否正确
+        if (room.isLocked() && !room.getPassword().equals(roomPassword)) {
+            throw new ForbiddenException("对不起，您输入的房间密码有误!");
+        }
+        //分配座位顺序
+        Player player = new Player();
+        List<Player> playerlist = room.getPlayerList();
+        List<Integer> idList = new ArrayList();
+        if (playerlist.size() == 1) {
+            Player player0 = playerlist.get(0);
+            int id0 = player0.getId();
+            idList.add(id0);
+        } else {
+            Player player0 = playerlist.get(0);
+            Player player1 = playerlist.get(1);
+            int id0 = player0.getId();
+            int id1 = player1.getId();
+            idList.add(id0);
+            idList.add(id1);
+        }
+        if (!idList.contains(1)) {
+            player.setId(1);
+        } else if (!idList.contains(2)) {
+            player.setId(2);
+        } else {
+            player.setId(3);
+        }
+        player.setUser(user);
+        room.getUserList().add(user);
+        room.getPlayerList().add(player);
 
+        setUserRoom(user.getId(), room.getId());
+        return "加入成功!";
     }
 
     /**
@@ -173,8 +151,9 @@ public class RoomComponent {
 
     public Room getRoom(String roomId) {
         Room room = roomMap.get(roomId);
-        if (room == null)
+        if (room == null) {
             throw new NotFoundException("该房间不存在");
+        }
         return room;
     }
 

@@ -2,6 +2,7 @@ package site.pushy.landlords.pojo;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 import site.pushy.landlords.core.CardDistribution;
 import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.pojo.DO.User;
@@ -137,6 +138,10 @@ public class Room {
     public List<Player> getFarmers() {
         return getPlayerList().stream().filter(Player::isFarmer)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isLocked() {
+        return locked && StringUtils.hasLength(getPassword());
     }
 
     public void addPlayer(Player player) {
