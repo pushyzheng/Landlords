@@ -20,6 +20,8 @@ public class UserOutDTO {
 
     private String avatar;
 
+    private Double money;
+
     public static UserOutDTO fromUser(User user) {
         if (user == null) {
             return null;
@@ -29,6 +31,7 @@ public class UserOutDTO {
         userOutDTO.setUsername(user.getUsername());
         userOutDTO.setAvatar(user.getAvatar());
         userOutDTO.setGender(user.getGender());
+        userOutDTO.setMoney(user.getMoney());
         return userOutDTO;
     }
 }

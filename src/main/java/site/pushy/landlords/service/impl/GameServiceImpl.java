@@ -88,6 +88,7 @@ public class GameServiceImpl implements GameService {
                 player.setIdentity(IdentityEnum.FARMER);
             }
         }
+        room.setPrePlayTime(System.currentTimeMillis());
         roomComponent.updateRoom(room);
         notifyComponent.sendToAllUserOfRoom(room.getId(), new BidEndMessage()); // 叫牌结束
         if (landlordUser == null) {

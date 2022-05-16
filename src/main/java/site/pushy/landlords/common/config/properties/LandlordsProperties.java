@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.stereotype.Service;
+import site.pushy.landlords.core.enums.TimeoutStrategy;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -29,8 +30,20 @@ public class LandlordsProperties {
     private int maxSecondsForEveryRound = 30;
 
     /**
-     * 心跳检测超时时间, 单位: 秒
+     * 心跳检测超时时间, 默认单位: 秒
      */
     @DurationUnit(ChronoUnit.SECONDS)
     private Duration heartbeatTimeout = Duration.ofMinutes(3);
+
+    /**
+     * 聊天发送的最大频率, 默认单位: 秒
+     */
+    private Double permitsPerSecondOfChat = 0.5;
+
+    /**
+     * 玩家在超时没有出牌后, 处理的策略
+     *
+     * @see TimeoutStrategy
+     */
+    private TimeoutStrategy timeoutStrategy;
 }

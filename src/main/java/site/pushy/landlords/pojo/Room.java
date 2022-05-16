@@ -174,6 +174,14 @@ public class Room {
         stepNum++;
     }
 
+    /**
+     * 当前出牌的玩家
+     */
+    public int getCurrentPlayerId() {
+        int r = getStepNum() / 3;
+        return r == 0 ? 3 : r;
+    }
+
     public void incrBiddingPlayer() {
         if (biddingPlayer == 3) {
             biddingPlayer = 1;
