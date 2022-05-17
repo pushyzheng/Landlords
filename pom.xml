@@ -60,12 +60,6 @@
             <artifactId>druid</artifactId>
             <version>1.1.9</version>
         </dependency>
-        <!--fastjson-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
-        </dependency>
         <!--mybatis 逆向工程依赖-->
         <dependency>
             <groupId>org.mybatis.generator</groupId>
@@ -135,6 +129,12 @@
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_hotspot</artifactId>
             <version>${prometheus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>0.10.4</version>
         </dependency>
     </dependencies>
 

@@ -1,5 +1,6 @@
 package site.pushy.landlords.service.impl;
 
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import site.pushy.landlords.service.GameService;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Pushy
@@ -32,6 +34,8 @@ import java.util.List;
 public class GameServiceImpl implements GameService {
 
     private static final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
+
+    private final Random random = new Random();
 
     @Resource
     private RoomComponent roomComponent;
@@ -53,7 +57,10 @@ public class GameServiceImpl implements GameService {
         // 检查是否房间内的人数等于3人，并且全部都处于准备中的状态
         boolean isAllReady = room.isAllReady();
         if (isAllReady) {
-            startGame(room.getId());
+            room.getSync().lock();
+            Try.run(() -> startGame(room))
+                    .onFailure(throwable -> logger.error("[{}] 开始游戏异常", room.getId(), throwable))
+                    .andFinally(() -> room.getSync().unlock());
         }
         return isAllReady;
     }
@@ -71,13 +78,16 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void want(User user, int score) {
-        logger.info(String.format("玩家【%s】叫牌，分数为：%d 分", user.getUsername(), score));
-
         Room room = roomComponent.getUserRoom(user.getId());
+        logger.info("[{}] 玩家 {} 叫牌，分数为 {} 分", room.getId(), user.getUsername(), score);
+
         room.setMultiple(score);
         User landlordUser = null;
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
+                if (player.getId() != room.getBiddingPlayer()) {
+                    throw new ForbiddenException("不是当前用户的叫牌回合");
+                }
                 landlordUser = player.getUser();
                 room.setStepNum(player.getId());
                 player.setIdentity(IdentityEnum.LANDLORD);
@@ -88,14 +98,14 @@ public class GameServiceImpl implements GameService {
                 player.setIdentity(IdentityEnum.FARMER);
             }
         }
-        room.setPrePlayTime(System.currentTimeMillis());
-        roomComponent.updateRoom(room);
-        notifyComponent.sendToAllUserOfRoom(room.getId(), new BidEndMessage()); // 叫牌结束
         if (landlordUser == null) {
             throw new IllegalStateException("选取的地主玩家不能为空");
         }
+        room.setPrePlayTime(System.currentTimeMillis());
+        roomComponent.updateRoom(room);
+        notifyComponent.sendToAllUserOfRoom(room.getId(), new BidEndMessage()); // 叫牌结束
         notifyComponent.sendToUser(landlordUser.getId(), new PleasePlayCardMessage());
-        logger.info(String.format("【%s】 玩家【%s】成为地主", room.getId(), landlordUser.getUsername()));
+        logger.info("[{}] 玩家 {} 成为地主", room.getId(), landlordUser.getUsername());
     }
 
     @Override
@@ -127,8 +137,8 @@ public class GameServiceImpl implements GameService {
                         }
                     }
                 }
-                logger.info(String.format("玩家【%d】选择不叫，由下家【%d】玩家叫牌", playerId,
-                        playerId == 3 ? 1 : playerId + 1));
+                logger.info("[{}] 玩家 {} 选择不叫，由下家 {} 玩家叫牌", room.getId(),
+                        playerId, player.getNextPlayerId());
                 break;
             }
         }
@@ -136,22 +146,22 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public RoundResult playCard(User user, List<Card> cardList) {
-        logger.info("user({}) playCard: {}", user.getUsername(), cardList);
         Room room = roomComponent.getUserRoom(user.getId());
-        Player player = room.getPlayerByUserId(user.getId());
+        logger.info("[{}] 玩家 {} 出牌: {}", room.getId(), user.getUsername(), cardList);
 
-        /* 校验玩家出的牌是否符合斗地主规则规范 */
+        Player player = room.getPlayerByUserId(user.getId());
+        // 校验玩家出的牌是否符合斗地主规则规范
         TypeEnum myType = CardUtils.getCardsType(cardList);
         if (myType == null) {
-            logger.info(String.format("玩家【%s】打出的牌不符合规则", user.getUsername()));
+            logger.warn("[{}] 玩家 {} 打出的牌不符合规则", room.getId(), user.getUsername());
             throw new ForbiddenException("玩家打出的牌不符合规则");
         }
         if (room.getPreCards() != null && room.getPrePlayerId() != player.getId()) {
-            /* 判断该玩家打出的牌是否能比上家出的牌大 */
+            // 判断该玩家打出的牌是否能比上家出的牌大
             TypeEnum preType = CardUtils.getCardsType(room.getPreCards());
             boolean canPlay = GradeComparison.canPlayCards(cardList, myType, room.getPreCards(), preType);
-            logger.info(String.format("【%s】 myType：%s，preType：%s，canPlay：%b", user.getUsername(),
-                    myType.getName(), preType.getName(), canPlay));
+            logger.info("【{}】 myType：{}，preType：{}，canPlay：{}", user.getUsername(),
+                    myType.getName(), preType.getName(), canPlay);
             if (!canPlay) {
                 throw new ForbiddenException("该玩家出的牌管不了上家");
             }
@@ -171,12 +181,12 @@ public class GameServiceImpl implements GameService {
             if (isSpring(room, player)) {
                 room.doubleMultiple();
             }
-            logger.info(String.format("【%s】游戏结束，【%s】获胜！", room.getId(), player.getIdentityName()));
+            logger.info("[{}] 游戏结束，{} 获胜！", room.getId(), player.getIdentityName());
             result = getResult(room, player);
             room.reset();
         } else {
-            logger.info(String.format("玩家【%s】出牌，类型为：【%s】，下一个出牌者序号为：%d", player.getUser().getUsername(),
-                    myType.getName(), player.getNextPlayerId()));
+            logger.info("[{}] 玩家 {} 出牌，类型为 {}，下一个出牌者序号为：{}", room.getId(),
+                    player.getUser().getUsername(), myType.getName(), player.getNextPlayerId());
             room.setPreCards(cardList);
             room.setPrePlayerId(player.getId());
             room.incrStep();
@@ -198,17 +208,20 @@ public class GameServiceImpl implements GameService {
         room.setPrePlayTime(System.currentTimeMillis());
         roomComponent.updateRoom(room);
 
-        logger.info(String.format("玩家【%s】要不起，下一个出牌者序号为：%d", user.getUsername(), player.getNextPlayerId()));
+        logger.info("[{}] 玩家 {} 要不起，下一个出牌者序号为：{}", room.getId(),
+                user.getUsername(), player.getNextPlayerId());
         User nextUser = room.getUserByPlayerId(player.getNextPlayerId()); // 通过下一个玩家出牌
         notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
         notifyComponent.sendToAllUserOfRoom(room.getId(), new PassMessage(user));
     }
 
-    public void startGame(String roomId) {
-        Room room = roomComponent.getRoom(roomId);
+    private void startGame(Room room) {
+        if (room.getStatus() == RoomStatusEnum.PLAYING) {
+            throw new IllegalStateException("房间游戏已经开始了");
+        }
+        String roomId = room.getId();
         room.setStatus(RoomStatusEnum.PLAYING);  // 更新游戏状态为游戏中
 
-        // TODO: concurrent problem
         // 构造 CardDistribution类，进行发牌
         room.setDistribution(new CardDistribution());
         CardDistribution distribution = room.getDistribution();
@@ -224,16 +237,12 @@ public class GameServiceImpl implements GameService {
         notifyComponent.sendToAllUserOfRoom(roomId, new StartGameMessage(roomId));
 
         // 在分牌之后随机分牌一个玩家进行叫地主
-        int order = (int) (1 + Math.random() * (3 - 1 + 1));  //从1到3的int型随机数
+        int order = random.nextInt(3) + 1;  //从1到3的int型随机数
         room.setBiddingPlayer(order);
-        for (Player player : room.getPlayerList()) {
-            if (player.getId().equals(order)) {
-                // 通知被选择叫牌的玩家客户端开始叫牌
-                logger.info(String.format("【%s】通知玩家 %s 叫牌", room.getId(), player.getUser().getUsername()));
-                notifyComponent.sendToUser(player.getUser().getId(), new BidMessage());
-                break;
-            }
-        }
+        Player player = room.getPlayerById(order);
+        // 通知被选择叫牌的玩家客户端开始叫牌
+        logger.info("[{}] 通知玩家 {} 叫牌", room.getId(), player.getUser().getUsername());
+        notifyComponent.sendToUser(player.getUser().getId(), new BidMessage());
         roomComponent.updateRoom(room);
     }
 

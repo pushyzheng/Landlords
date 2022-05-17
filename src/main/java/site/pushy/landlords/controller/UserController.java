@@ -2,7 +2,7 @@ package site.pushy.landlords.controller;
 
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.UnauthorizedException;
-import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.UserDTO;
 import site.pushy.landlords.service.UserService;
@@ -23,13 +23,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/myself")
-    public String getMyUser(@SessionAttribute User curUser) {
-        return RespEntity.success(curUser);
+    public ApiResponse<User> getMyUser(@SessionAttribute User curUser) {
+        return ApiResponse.success(curUser);
     }
 
     @PutMapping("")
-    public String updateUser(@SessionAttribute User curUser, HttpServletRequest request,
-                             @Valid @RequestBody UserDTO userDTO) {
+    public ApiResponse<Boolean> updateUser(@SessionAttribute User curUser, HttpServletRequest request,
+                                           @Valid @RequestBody UserDTO userDTO) {
         User record = userService.getUserById(curUser.getId());
         if (record == null) {
             throw new UnauthorizedException("用户信息为空");
@@ -40,6 +40,6 @@ public class UserController {
         record.setGender(userDTO.getGender());
         // 更新 session 中的用户信息
         request.getSession().setAttribute("curUser", record);
-        return RespEntity.success(userService.updateUser(record));
+        return ApiResponse.success(userService.updateUser(record));
     }
 }

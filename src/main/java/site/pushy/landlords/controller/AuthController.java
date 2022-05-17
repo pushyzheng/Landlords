@@ -12,8 +12,8 @@ import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.JWTUtil;
-import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.dao.UserMapper;
+import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DO.UserExample;
 import site.pushy.landlords.pojo.DTO.LoginDTO;
@@ -45,7 +45,7 @@ public class AuthController {
      * 用户登录
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid @RequestBody LoginDTO body, HttpServletRequest request) {
+    public ApiResponse<String> login(@Valid @RequestBody LoginDTO body, HttpServletRequest request) {
         User user = getUserByName(body.getUsername());
         if (user == null) {
             // 用户第一次登录，增加用户记录
@@ -56,7 +56,7 @@ public class AuthController {
             throw new UnauthorizedException("账号或密码错误");
         }
         String token = saveSession(request, user);
-        return RespEntity.success(token);
+        return ApiResponse.success(token);
     }
 
     /**

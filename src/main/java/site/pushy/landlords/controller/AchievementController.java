@@ -4,7 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.pojo.ApiResponse;
+import site.pushy.landlords.pojo.DO.Achievement;
 import site.pushy.landlords.service.AchievementService;
 
 import javax.annotation.Resource;
@@ -21,7 +22,7 @@ public class AchievementController {
     private AchievementService achievementService;
 
     @GetMapping("/{userId}")
-    public String getAchievementByUserId(@PathVariable String userId) {
-        return RespEntity.success(achievementService.getAchievementByUserId(userId));
+    public ApiResponse<Achievement> getAchievementByUserId(@PathVariable String userId) {
+        return ApiResponse.success(achievementService.getAchievementByUserId(userId));
     }
 }

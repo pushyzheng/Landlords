@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
-import site.pushy.landlords.common.exception.ForbiddenException;
-import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.common.exception.TooManyRequestException;
 import site.pushy.landlords.core.component.NotifyComponent;
+import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.ChatDTO;
 import site.pushy.landlords.pojo.DTO.UserOutDTO;
@@ -46,9 +46,9 @@ public class ChatController {
      * 向所在房间的用户或服务器的所有用户广播消息
      */
     @PostMapping
-    public String chat(@SessionAttribute User curUser, @Valid @RequestBody ChatDTO body) {
+    public ApiResponse<?> chat(@SessionAttribute User curUser, @Valid @RequestBody ChatDTO body) {
         if (!checkLimit(curUser)) {
-            throw new ForbiddenException("你说话太快啦~");
+            throw new TooManyRequestException("你说话太快啦~");
         }
         ChatMessage message = new ChatMessage(body.getContent());
         message.setTypeId(body.getType());
@@ -59,9 +59,9 @@ public class ChatController {
             Room room = roomService.getRoomForUser(curUser);
             message.setDimension(ChatDTO.DimensionType.ROOM.toString());
             boolean result = notifyComponent.sendToAllUserOfRoom(room.getId(), message);
-            return RespEntity.success(result);
+            return ApiResponse.success(result);
         } else if (ChatDTO.DimensionType.ALL.toString().equals(body.getDimension())) {
-            return RespEntity.success(notifyComponent.sendToAllUser(message));
+            return ApiResponse.success(notifyComponent.sendToAllUser(message));
         } else {
             throw new BadRequestException("不支持的聊天范围: " + body.getDimension());
         }

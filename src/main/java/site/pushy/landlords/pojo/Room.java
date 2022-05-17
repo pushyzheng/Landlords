@@ -1,6 +1,6 @@
 package site.pushy.landlords.pojo;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 import site.pushy.landlords.core.CardDistribution;
@@ -9,6 +9,8 @@ import site.pushy.landlords.pojo.DO.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +90,14 @@ public class Room {
      */
     private long prePlayTime;
 
+    @JsonIgnore
     private CardDistribution distribution;
+
+    /**
+     * 同步器, 防止并发操作
+     */
+    @JsonIgnore
+    private Lock sync;
 
     public String getStatusValue() {
         return status != null ? status.getValue() : "";
@@ -103,6 +112,7 @@ public class Room {
         this.prePlayerId = 0;
         this.stepNum = -1;   // 当step = -1时代表叫牌还未结束
         this.biddingPlayer = -1;
+        this.sync = new ReentrantLock();
     }
 
     public Room(String id) {
@@ -127,14 +137,14 @@ public class Room {
         }
     }
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     public Player getLandlord() {
         return getPlayerList().stream().filter(Player::isLandlord)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("地主玩家不存在"));
     }
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     public List<Player> getFarmers() {
         return getPlayerList().stream().filter(Player::isFarmer)
                 .collect(Collectors.toList());
@@ -211,7 +221,9 @@ public class Room {
      */
     public Player getPlayerById(int playerId) {
         for (Player player : playerList) {
-            if (player.getId() == playerId) return player;
+            if (player.getId() == playerId) {
+                return player;
+            }
         }
         return null;
     }

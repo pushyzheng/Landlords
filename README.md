@@ -2,7 +2,11 @@
 
 ## 简介
 
-`Landlords`是一款可以在线和好友斗地主的游戏，开发初心是因为市面上的大多数斗地主游戏都不支持好友同玩。而`Landlords`则可以满足你和好友开黑的乐趣！
+[Landlords](http://landlords.pushyzheng.com/#/) 是一款可以在线和好友一起斗地主的游戏，独乐乐不如众乐乐！
+
+开发初心是因为市面上的大多数斗地主游戏都不支持好友同玩，而 Landlords 则可以满足你和好友开黑的乐趣！
+
+在线地址：[landlords.pushyzheng.com](http://landlords.pushyzheng.com/#/)
 
 ## 游戏截图
 
@@ -22,6 +26,10 @@
 
 ![game-end.png](images/5c79292ed3d91.png)
 
+## 独立部署
+
+参考：[部署](docs/部署.md)
+
 ## 设计思路
 
 如果你对这个的后台设计思路感兴趣，可以阅读我的博客中斗地主的相关系列：
@@ -38,12 +46,11 @@
 
 [![alt text](https://avatars3.githubusercontent.com/u/45006187?s=460&v=4 "title")](https://github.com/Fx12138)
 
-`Fx12138`
+Fx12138
 
 ## 联系我
 
-如果您在游戏的过程中遇到任何`bug`或者您有什么改进的建议，以及有项目的实现细节需要提问，都可以通过下面的联系方式联系我：
+如果你在游戏的过程中遇到任何 Bug 或者有什么任何的建议，可以通过下面的邮箱与我联系：
 
-- Email：1437876073@qq.com
-- QQ：1437876073
+- QQ Email：1437876073@qq.com
 

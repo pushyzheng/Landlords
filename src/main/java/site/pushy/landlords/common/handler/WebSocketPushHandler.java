@@ -1,12 +1,12 @@
 package site.pushy.landlords.common.handler;
 
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import site.pushy.landlords.common.config.properties.LandlordsProperties;
+import site.pushy.landlords.common.util.JsonUtils;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.ws.PongMessage;
 import site.pushy.landlords.service.MetricsService;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -180,7 +179,7 @@ public class WebSocketPushHandler implements WebSocketHandler {
             }
         });
         // Reply PONG message
-        String respContent = JSON.toJSONString(new PongMessage());
+        String respContent = JsonUtils.toJson(new PongMessage());
         session.sendMessage(new TextMessage(respContent));
     }
 

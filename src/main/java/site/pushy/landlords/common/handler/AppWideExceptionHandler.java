@@ -1,6 +1,8 @@
 package site.pushy.landlords.common.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,13 +11,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import site.pushy.landlords.common.exception.BadRequestException;
-import site.pushy.landlords.common.exception.ForbiddenException;
-import site.pushy.landlords.common.exception.NotFoundException;
-import site.pushy.landlords.common.exception.UnauthorizedException;
-import site.pushy.landlords.common.util.RespEntity;
+import site.pushy.landlords.common.exception.BaseException;
+import site.pushy.landlords.pojo.ApiResponse;
 
 @ControllerAdvice
+@Slf4j
 public class AppWideExceptionHandler {
 
     /**
@@ -24,7 +24,7 @@ public class AppWideExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String missingParameterException(MissingServletRequestParameterException e) {
+    public ApiResponse<Object> missingParameterException(MissingServletRequestParameterException e) {
         String errorMsg;
         if (e != null) {
             String parameterName = e.getParameterName();
@@ -32,7 +32,7 @@ public class AppWideExceptionHandler {
         } else {
             errorMsg = "请求数据校验不合法";
         }
-        return RespEntity.error(400, errorMsg);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST, errorMsg);
     }
 
     /**
@@ -41,7 +41,7 @@ public class AppWideExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String argumentNotValidException(MethodArgumentNotValidException e) {
+    public ApiResponse<Object> argumentNotValidException(MethodArgumentNotValidException e) {
         String errorMsg;
         if (e != null) {
             BindingResult result = e.getBindingResult();
@@ -51,54 +51,23 @@ public class AppWideExceptionHandler {
         } else {
             errorMsg = "请求表单参数不合法";
         }
-        return RespEntity.error(400, errorMsg);
+        return ApiResponse.error(HttpStatus.BAD_REQUEST, errorMsg);
     }
 
-    /**
-     * HTTP 400 错误
-     */
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BaseException.class)
     @ResponseBody
-    public String errorException(BadRequestException e) {
-        return errorResponse(e, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<Object>> errorException(BaseException e) {
+        return ResponseEntity
+                .status(e.getHttpStatus())
+                .body(ApiResponse.error(e.getHttpStatus(), e.getMessage()));
     }
 
-    /**
-     * HTTP 404 错误
-     */
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    public String errorException(NotFoundException e) {
-        return errorResponse(e, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * HTTP 401 错误
-     */
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public String errorException(UnauthorizedException e) {
-        return errorResponse(e, HttpStatus.UNAUTHORIZED);
-    }
-
-    /**
-     * HTTP 403 错误
-     */
-    @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ResponseBody
-    public String errorException(ForbiddenException e) {
-        return errorResponse(e, HttpStatus.FORBIDDEN);
-    }
-
-    private String errorResponse(RuntimeException e, HttpStatus status) {
-        String message = e.getMessage();
-        if (message == null || message.isEmpty()) {
-            message = status.getReasonPhrase();
-        }
-        return RespEntity.error(status.value(), message);
+    public ResponseEntity<ApiResponse<Object>> errorException(Exception e) {
+        log.error("未知异常", e);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "服务器错误"));
     }
 }

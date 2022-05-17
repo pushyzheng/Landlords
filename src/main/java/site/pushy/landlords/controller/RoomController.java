@@ -1,14 +1,15 @@
 package site.pushy.landlords.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.exception.BadRequestException;
-import site.pushy.landlords.common.util.RespEntity;
 import site.pushy.landlords.core.component.RoomComponent;
+import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.DO.User;
+import site.pushy.landlords.pojo.DTO.CreateRoomDTO;
 import site.pushy.landlords.pojo.DTO.RoomDTO;
 import site.pushy.landlords.pojo.DTO.RoomListOutputDTO;
+import site.pushy.landlords.pojo.DTO.RoomOutDTO;
 import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.service.RoomService;
 
@@ -35,53 +36,52 @@ public class RoomController {
      * 获取所有房间列表
      */
     @GetMapping("")
-    public String listRoom() {
+    public ApiResponse<?> listRoom() {
         List<Room> roomList = roomComponent.getRooms();
         if (roomList.size() != 0) {
             List<RoomListOutputDTO> dtoList = roomList.stream()
                     .map(RoomListOutputDTO::new)
                     .collect(Collectors.toList());
-            return RespEntity.success(dtoList);
+            return ApiResponse.success(dtoList);
         }
-        return RespEntity.success(roomList);
+        return ApiResponse.success(roomList);
     }
 
     /**
      * 通过房间号id查看某房间的所有信息，该玩家必须在该房间内
      */
     @GetMapping("/{id}")
-    public String getRoomById(@PathVariable String id,
-                              @SessionAttribute User curUser) {
-        return RespEntity.success(roomService.getRoomById(curUser, id));
+    public ApiResponse<RoomOutDTO> getRoomById(@PathVariable String id,
+                                               @SessionAttribute User curUser) {
+        return ApiResponse.success(roomService.getRoomById(curUser, id));
     }
 
     /**
      * 创建房间
      */
     @PostMapping("")
-    public String createRoom(@SessionAttribute User curUser,
-                             @RequestBody JSONObject body) {
-        String title = body.getString("title");
-        if (!StringUtils.hasLength(title)) {
+    public ApiResponse<Room> createRoom(@SessionAttribute User curUser,
+                                        @Valid @RequestBody CreateRoomDTO body) {
+        if (!StringUtils.hasLength(body.getTitle())) {
             throw new BadRequestException("房间名称不能为空");
         }
-        return RespEntity.success(roomService.createRoom(curUser, title, body.getString("password")));
+        return ApiResponse.success(roomService.createRoom(curUser, body.getTitle(), body.getPassword()));
     }
 
     /**
      * 加入房间
      */
     @PostMapping("/join")
-    public String joinRoom(@Valid @RequestBody RoomDTO roomDTO,
-                           @SessionAttribute User curUser) {
-        return RespEntity.success(roomService.joinRoom(curUser, roomDTO));
+    public ApiResponse<String> joinRoom(@Valid @RequestBody RoomDTO roomDTO,
+                                        @SessionAttribute User curUser) {
+        return ApiResponse.success(roomService.joinRoom(curUser, roomDTO));
     }
 
     /**
      * 退出房间
      */
     @PostMapping("/exit")
-    public String exitRoom(@SessionAttribute User curUser) {
-        return RespEntity.success(roomService.exitRoom(curUser));
+    public ApiResponse<Boolean> exitRoom(@SessionAttribute User curUser) {
+        return ApiResponse.success(roomService.exitRoom(curUser));
     }
 }
