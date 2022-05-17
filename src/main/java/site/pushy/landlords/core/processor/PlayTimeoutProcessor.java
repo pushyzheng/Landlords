@@ -1,4 +1,4 @@
-package site.pushy.landlords.processor;
+package site.pushy.landlords.core.processor;
 
 import site.pushy.landlords.core.enums.TimeoutStrategy;
 import site.pushy.landlords.pojo.Room;
