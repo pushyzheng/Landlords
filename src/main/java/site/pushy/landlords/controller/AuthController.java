@@ -12,18 +12,16 @@ import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.UnauthorizedException;
 import site.pushy.landlords.common.util.JWTUtil;
-import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.pojo.DO.UserExample;
 import site.pushy.landlords.pojo.DTO.LoginDTO;
+import site.pushy.landlords.service.UserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * @author Fuxing
@@ -36,7 +34,7 @@ public class AuthController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Resource
     private LandlordsProperties properties;
@@ -50,7 +48,7 @@ public class AuthController {
         if (user == null) {
             // 用户第一次登录，增加用户记录
             user = new User(body.getUsername(), body.getPassword());
-            userMapper.insert(user);
+            userService.save(user);
         } else if (!user.getPassword().equals(body.getPassword())) {
             logger.warn("登录失败, 账号密码错误: {}", body.getUsername());
             throw new UnauthorizedException("账号或密码错误");
@@ -97,7 +95,7 @@ public class AuthController {
                 }
                 user = new User(userInfo.getNickname(), "", openid, userInfo.getAvatar().getAvatarURL100());
                 user.setGender(userInfo.getGender());
-                userMapper.insert(user);
+                userService.save(user);
             }
             String token = saveSession(request, user);
             response.sendRedirect(String.format("http://%s/#/oauth/%s", properties.getFrontendHost(), token));
@@ -125,18 +123,14 @@ public class AuthController {
     }
 
     private User getUserByName(String username) {
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
-        criteria.andUsernameEqualTo(username);
-        List<User> users = userMapper.selectByExample(userExample);
-        return users.isEmpty() ? null : users.get(0);
+        return userService.getByCondition(UserService.Condition.builder()
+                .name(username)
+                .build());
     }
 
     private User getUserByOpenId(String openid) {
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
-        criteria.andOpenidEqualTo(openid);
-        List<User> users = userMapper.selectByExample(userExample);
-        return users.isEmpty() ? null : users.get(0);
+        return userService.getByCondition(UserService.Condition.builder()
+                .openId(openid)
+                .build());
     }
 }

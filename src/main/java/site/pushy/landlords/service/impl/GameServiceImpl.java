@@ -142,6 +142,7 @@ public class GameServiceImpl implements GameService {
                 break;
             }
         }
+        roomComponent.updateRoom(room);
     }
 
     @Override

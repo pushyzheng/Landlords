@@ -1,15 +1,9 @@
 server:
-  port: 8080
-
-#database:
-#  engine: MySQL
-#  url: jdbc:mysql://localhost:3306/landlords?serverTimezone=GMT
-#  username: root
-#  password: 12345678
+  port: 18080
 
 database:
   engine: SQLite
-  url: jdbc:sqlite:db/landlords.sqlite3
+  url: jdbc:sqlite:db/landlords-test.sqlite3
   username:
   password:
 

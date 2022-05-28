@@ -1,16 +1,22 @@
 package site.pushy.landlords.core.component;
 
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.codec.JsonJacksonCodec;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import site.pushy.landlords.common.exception.BadRequestException;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.common.exception.NotFoundException;
+import site.pushy.landlords.common.util.EnvUtils;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
 
+import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author fuxing
@@ -19,23 +25,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RoomComponent {
 
-    // 用户玩家当前所在的房间号映射Map
-    private final Map<String, String> userRoomMap = new ConcurrentHashMap<>();
+    private static final String ROOM_MAP_KEY = "landlords::room:mapping";
 
-    // 房间号和与该房间所对应的Room对象映射Map
-    private final Map<String, Room> roomMap = new ConcurrentHashMap<>();
+    private static final String USER_ROOM_MAP_KEY = "landlords::room:user-mapping";
+
+    @Resource
+    private RedissonClient redissonClient;
 
     /**
      * 创建房间
      *
-     * @param user
-     * @return
+     * @param user         房主
+     * @param title        房间标题
+     * @param roomPassword 密码(可选)
      */
     public Room createRoom(User user, String title, String roomPassword) {
-        if (getUserRoomId(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
+        RMap<String, String> userRoomRMap = getUserRoomRMap();
+        String roomId = userRoomRMap.get(user.getId());
+        if (StringUtils.hasLength(userRoomRMap.get(user.getId()))) {
+            throw new ForbiddenException("用户已在房间号为 " + roomId + " 的房间");
         }
-        String roomId = newRoomid();
+
+        roomId = newRoomid();
         Room room = new Room(roomId);
         room.setTitle(title);
         room.setOwner(user);
@@ -50,8 +61,8 @@ public class RoomComponent {
             room.setLocked(true);
             room.setPassword(roomPassword);
         }
-        roomMap.put(roomId, room);
-        setUserRoom(user.getId(), roomId);
+        getRoomRMap().put(roomId, room);
+        userRoomRMap.put(user.getId(), roomId);
         return room;
     }
 
@@ -63,10 +74,13 @@ public class RoomComponent {
      * @author fuxing
      */
     public String joinRoom(String id, User user, String roomPassword) {
-        if (getUserRoomId(user.getId()) != null) {
-            throw new ForbiddenException("用户已在房间号为 " + getUserRoomId(user.getId()) + " 的房间");
+        RMap<String, String> userRoomRMap = getUserRoomRMap();
+        String roomId = userRoomRMap.get(user.getId());
+        if (StringUtils.hasLength(roomId)) {
+            throw new ForbiddenException("用户已在房间号为 " + roomId + " 的房间");
         }
-        Room room = roomMap.get(id);
+        RMap<String, Room> roomRMap = getRoomRMap();
+        Room room = roomRMap.get(id);
         //检查房间是否存在
         if (room == null) {
             throw new NotFoundException("该房间不存在，请核实您输入的房间号!");
@@ -87,7 +101,7 @@ public class RoomComponent {
         //分配座位顺序
         Player player = new Player();
         List<Player> playerlist = room.getPlayerList();
-        List<Integer> idList = new ArrayList();
+        List<Integer> idList = new ArrayList<>();
         if (playerlist.size() == 1) {
             Player player0 = playerlist.get(0);
             int id0 = player0.getId();
@@ -111,7 +125,8 @@ public class RoomComponent {
         room.getUserList().add(user);
         room.getPlayerList().add(player);
 
-        setUserRoom(user.getId(), room.getId());
+        roomRMap.put(id, room);
+        userRoomRMap.put(user.getId(), room.getId());
         return "加入成功!";
     }
 
@@ -123,17 +138,19 @@ public class RoomComponent {
     public boolean exitRoom(String id, User curUser) {
         removeUserRoom(curUser.getId());
 
-        Room room = roomMap.get(id);
+        RMap<String, Room> roomRMap = getRoomRMap();
+        Room room = roomRMap.get(id);
         if (room == null) {
             throw new NotFoundException("该房间不存在");
         }
         room.removeUser(curUser.getId());
         room.removePlayer(curUser.getId());
-        // 检查房间内剩余人数是否为0，为0则解散
+        // 检查房间内剩余人数是否为 0，为 0 则解散
         if (room.getPlayerList().size() == 0) {
-            roomMap.remove(id);
+            roomRMap.remove(id);
             return true;
         }
+        updateRoom(room);
         return false;
     }
 
@@ -142,7 +159,7 @@ public class RoomComponent {
      */
     public List<Room> getRooms() {
         List<Room> rooms = new LinkedList<>();
-        for (Map.Entry<String, Room> entry : roomMap.entrySet()) {
+        for (Map.Entry<String, Room> entry : getRoomRMap().entrySet()) {
             rooms.add(entry.getValue());
             Collections.sort(entry.getValue().getPlayerList());
         }
@@ -150,19 +167,19 @@ public class RoomComponent {
     }
 
     public Room getRoom(String roomId) {
-        Room room = roomMap.get(roomId);
-        if (room == null) {
+        RMap<String, Room> roomRMap = getRoomRMap();
+        if (!roomRMap.containsKey(roomId)) {
             throw new NotFoundException("该房间不存在");
         }
-        return room;
+        return roomRMap.get(roomId);
     }
 
     public void updateRoom(Room newRoom) {
-        String id = newRoom.getId();
-        if (roomMap.get(id) == null) {
+        RMap<String, Room> roomRMap = getRoomRMap();
+        if (!roomRMap.containsKey(newRoom.getId())) {
             throw new NotFoundException("该房间不存在");
         }
-        roomMap.put(id, newRoom);
+        roomRMap.put(newRoom.getId(), newRoom);
     }
 
     /**
@@ -183,32 +200,18 @@ public class RoomComponent {
      * 获取当前用户所在的房间对象
      */
     public Room getUserRoom(String userId) {
-        String roomId = userRoomMap.get(userId);
-        if (roomId == null) {
+        RMap<String, String> userRoomRMap = getUserRoomRMap();
+        if (!userRoomRMap.containsKey(userId)) {
             throw new BadRequestException("玩家还未加入房间内");
         }
-        return roomMap.get(roomId);
-    }
-
-    /**
-     * 设置用户当前所在的房间号
-     */
-    private void setUserRoom(String userId, String roomId) {
-        userRoomMap.put(userId, roomId);
+        return getRoom(userRoomRMap.get(userId));
     }
 
     /**
      * 移除用户当前所在房间的映射关系
      */
     private void removeUserRoom(String userId) {
-        userRoomMap.remove(userId);
-    }
-
-    /**
-     * 获取用户当前所在的房间号
-     */
-    private String getUserRoomId(String userId) {
-        return userRoomMap.get(userId);
+        getUserRoomRMap().remove(userId);
     }
 
     /**
@@ -219,7 +222,7 @@ public class RoomComponent {
         int a = (int) ((Math.random() * 9 + 1) * 100000);
         String roomid = String.valueOf(a);
         //获取当前所有房间id的集合
-        Iterator<String> iter = roomMap.keySet().iterator();
+        Iterator<String> iter = getRoomRMap().keySet().iterator();
         List roomidList = new ArrayList();
         while (iter.hasNext()) {
             String key = iter.next();
@@ -236,4 +239,29 @@ public class RoomComponent {
         }
     }
 
+    /**
+     * 房间号和与该房间所对应的 Room 对象映射 Map
+     */
+    private RMap<String, Room> getRoomRMap() {
+        return redissonClient.getMap(buildKey(ROOM_MAP_KEY), JsonJacksonCodec.INSTANCE);
+    }
+
+    /**
+     * 用户玩家当前所在的房间号映射 Map
+     */
+    private RMap<String, String> getUserRoomRMap() {
+        return redissonClient.getMap(buildKey(USER_ROOM_MAP_KEY), StringCodec.INSTANCE);
+    }
+
+    public void clearAll() {
+        if (EnvUtils.isNotTest()) {
+            throw new UnsupportedOperationException("ONLY invoke this method in test env");
+        }
+        getRoomRMap().clear();
+        getUserRoomRMap().clear();
+    }
+
+    private String buildKey(String original) {
+        return EnvUtils.isTest() ? "test::" + original : original;
+    }
 }

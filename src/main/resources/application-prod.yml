@@ -7,6 +7,10 @@ database:
   username:
   password:
 
+redis:
+  host: 127.0.0.1
+  port: 6379
+
 landlords:
   frontend-host: landlords.pushyzheng.com
   jwt-secret: 298b8610-6835-4d12-b8ae-efba3dbcccad
