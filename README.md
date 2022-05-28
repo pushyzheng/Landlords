@@ -2,31 +2,38 @@
 
 ## 简介
 
-[Landlords](http://landlords.pushyzheng.com/#/) 是一款可以在线和好友一起斗地主的游戏，独乐乐不如众乐乐！
+*Landlords* 是一款可以在线和好友一起斗地主的游戏，独乐乐不如众乐乐！
 
-开发初心是因为市面上的大多数斗地主游戏都不支持好友同玩，而 Landlords 则可以满足你和好友开黑的乐趣！
+开发初心是因为市面上的大多数斗地主游戏都不支持好友同玩，而 *Landlords* 则可以满足你和好友开黑的乐趣！
 
 在线地址：[landlords.pushyzheng.com](http://landlords.pushyzheng.com/#/)
 
 ## 游戏截图
 
+**登录界面**
+
+![](images/WX20220528-145859@2x.png)
+
 **游戏大厅**
 
-![game-center.png](images/5c7927eb1e33d.png)
+![](images/WX20220528-145958@2x.png)
 
 **发牌动画**
 
-![5afc60a9673d872732ee1694126b57d0.GIF](images/5c792c6fb2d0d.gif)
+![](images/distribute-card.gif)
 
 **出牌回合**
 
-![game-playing.png](images/5c79291f3a6e8.png)
+![](images/WX20220528-181754@2x.png)
 
-**结束计分板**
+**语音包**
 
-![game-end.png](images/5c79292ed3d91.png)
+![](images/WX20220528-183936@2x.png)
+
 
 ## 独立部署
+
+前端: [landlords-frontend](https://github.com/pushyzheng/landlords-frontend)
 
 参考：[部署](docs/部署.md)
 
