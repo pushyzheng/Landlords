@@ -1,10 +1,11 @@
 package site.pushy.landlords.service.impl;
 
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
+import site.pushy.landlords.common.exception.NotFoundException;
 import site.pushy.landlords.core.component.NotifyComponent;
 import site.pushy.landlords.core.component.RoomComponent;
 import site.pushy.landlords.dao.AchievementMapper;
-import site.pushy.landlords.dao.UserMapper;
 import site.pushy.landlords.pojo.DO.Achievement;
 import site.pushy.landlords.pojo.DO.AchievementExample;
 import site.pushy.landlords.pojo.DO.User;
@@ -14,6 +15,7 @@ import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.pojo.ws.GameEndMessage;
 import site.pushy.landlords.service.AchievementService;
+import site.pushy.landlords.service.UserService;
 
 import javax.annotation.Resource;
 
@@ -33,7 +35,7 @@ public class AchievementServiceImpl implements AchievementService {
     private AchievementMapper achievementMapper;
 
     @Resource
-    private UserMapper userMapper;
+    private UserService userService;
 
     @Resource
     private RoomComponent roomComponent;
@@ -82,7 +84,7 @@ public class AchievementServiceImpl implements AchievementService {
             gameEndMessage.setWinning(isWinning);
             messages.add(gameEndMessage);
 
-            userMapper.updateByPrimaryKeySelective(user);
+            userService.updateUser(user);
             updateAchievement(user.getId(), isWinning);   // 更新战绩
         }
 
@@ -96,11 +98,19 @@ public class AchievementServiceImpl implements AchievementService {
 
     @Override
     public Achievement getAchievementByUserId(String userId) {
+        if (userService.getUserById(userId) == null) {
+            throw new NotFoundException("用户不存在");
+        }
         AchievementExample achievementExample = new AchievementExample();
         AchievementExample.Criteria criteria = achievementExample.createCriteria();
         criteria.andUserIdEqualTo(userId);
         List<Achievement> achievements = achievementMapper.selectByExample(achievementExample);
-        return achievements.isEmpty() ? null : achievements.get(0);
+        if (achievements.isEmpty()) {
+            Achievement achievement = new Achievement(userId);
+            achievementMapper.insert(achievement);
+            achievements = Lists.newArrayList(achievement);
+        }
+        return achievements.get(0);
     }
 
     /**
