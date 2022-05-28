@@ -6,10 +6,14 @@ import site.pushy.landlords.pojo.ApiResponse;
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.DTO.BidDTO;
+import site.pushy.landlords.pojo.Player;
+import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.service.AchievementService;
 import site.pushy.landlords.service.GameService;
 import site.pushy.landlords.service.PlayerService;
+import site.pushy.landlords.service.PromptService;
+import site.pushy.landlords.service.RoomService;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -24,6 +28,9 @@ import java.util.List;
 public class GameController {
 
     @Resource
+    private RoomService roomService;
+
+    @Resource
     private GameService gameService;
 
     @Resource
@@ -31,6 +38,9 @@ public class GameController {
 
     @Resource
     private AchievementService achievementService;
+
+    @Resource
+    private PromptService promptService;
 
     /**
      * 准备
@@ -86,6 +96,13 @@ public class GameController {
         validRound(curUser);
         gameService.pass(curUser);
         return ApiResponse.success("success");
+    }
+
+    @PostMapping("/prompt")
+    public ApiResponse<List<Card>> hello(@SessionAttribute User curUser) {
+        Room room = roomService.getRoomForUser(curUser);
+        Player curPlayer = room.getPlayerByUserId(curUser.getId());
+        return ApiResponse.success(promptService.prompt(room, curPlayer));
     }
 
     private void validRound(User curUser) {

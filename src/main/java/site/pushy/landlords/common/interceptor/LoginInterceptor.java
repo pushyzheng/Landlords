@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -42,8 +43,11 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         try {
             String id = JWTUtil.decode(token);
-            User user = userService.getUserById(id);
-            session.setAttribute("curUser", user);
+            Optional<User> user = userService.getUserById(id);
+            if (!user.isPresent()) {
+                throw new UnauthorizedException("用户不存在");
+            }
+            session.setAttribute("curUser", user.get());
             return true;
         } catch (Exception e) {
             throw new UnauthorizedException("用户未登录");

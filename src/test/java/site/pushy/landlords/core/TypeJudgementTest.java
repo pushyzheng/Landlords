@@ -3,6 +3,7 @@ package site.pushy.landlords.core;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
+import site.pushy.landlords.common.util.TestUtils;
 import site.pushy.landlords.core.enums.CardGradeEnum;
 import site.pushy.landlords.pojo.Card;
 
@@ -148,7 +149,6 @@ public class TypeJudgementTest {
     }
 
     private List<Card> buildCards(CardGradeEnum... arr) {
-        return Arrays.stream(arr).map(Card::new)
-                .collect(Collectors.toList());
+        return TestUtils.buildCards(arr);
     }
 }

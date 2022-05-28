@@ -5,8 +5,10 @@ import com.qq.connect.api.qzone.UserInfo;
 import com.qq.connect.javabeans.AccessToken;
 import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import site.pushy.landlords.common.config.properties.LandlordsProperties;
 import site.pushy.landlords.common.exception.BadRequestException;
@@ -105,6 +107,14 @@ public class AuthController {
             logger.error("QQ 登录回调异常", e);
             qqLogin(request, response);
         }
+    }
+
+    @GetMapping("/auth/check")
+    public ApiResponse<Boolean> checkToken(@RequestParam String token) {
+        boolean valid = Try.of(() -> JWTUtil.decode(token))
+                .map(StringUtils::hasLength)
+                .getOrElse(false);
+        return ApiResponse.success(valid);
     }
 
     /**

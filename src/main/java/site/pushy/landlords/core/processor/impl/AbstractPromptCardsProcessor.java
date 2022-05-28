@@ -12,7 +12,7 @@ public abstract class AbstractPromptCardsProcessor implements PromptCardsProcess
 
     @Override
     public List<Card> process(List<Card> curCards, List<Card> carsOfPrev) {
-        if (check(curCards, carsOfPrev)) {
+        if (!check(curCards, carsOfPrev)) {
             return PASS;
         }
         return process0(curCards, carsOfPrev);

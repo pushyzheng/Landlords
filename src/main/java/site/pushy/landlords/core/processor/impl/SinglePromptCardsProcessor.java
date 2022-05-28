@@ -1,6 +1,8 @@
 package site.pushy.landlords.core.processor.impl;
 
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Component;
+import site.pushy.landlords.core.CardUtils;
 import site.pushy.landlords.core.enums.CardNumberEnum;
 import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
@@ -19,6 +21,13 @@ public class SinglePromptCardsProcessor extends AbstractPromptCardsProcessor {
         }
         if (prevCard.getNumber() == CardNumberEnum.SMALL_JOKER) {
             return processBigJoker(curCards);
+        }
+        CardUtils.sortCards(curCards);
+        // 找到第一张大的牌
+        for (Card card : curCards) {
+            if (CardUtils.compareGradeTo(card, prevCard)) {
+                return Lists.newArrayList(card);
+            }
         }
         return PASS;
     }

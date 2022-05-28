@@ -7,6 +7,7 @@ import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.service.UserService;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,11 +16,11 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public User getUserById(String id) {
+    public Optional<User> getUserById(String id) {
         if (!StringUtils.hasLength(id)) {
             throw new IllegalArgumentException("用户 ID 不能为空");
         }
-        return userMapper.selectByPrimaryKey(id);
+        return Optional.ofNullable(userMapper.selectByPrimaryKey(id));
     }
 
     @Override
