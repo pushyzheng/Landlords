@@ -1,6 +1,9 @@
 package site.pushy.landlords.controller;
 
-import com.google.common.util.concurrent.RateLimiter;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
+import org.redisson.api.RedissonClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +23,6 @@ import site.pushy.landlords.service.RoomService;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 聊天接口
@@ -29,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping(value = "/chat", produces = "application/json")
 public class ChatController {
+
+    public static final String RATE_LIMITER_PREFIX = "landlords::rate-limiter::chat::";
 
     @Resource
     private NotifyComponent notifyComponent;
@@ -39,8 +42,8 @@ public class ChatController {
     @Resource
     private LandlordsProperties landlordsProperties;
 
-    @SuppressWarnings("UnstableApiUsage")
-    private final Map<String, RateLimiter> rateLimiterMap = new ConcurrentHashMap<>();
+    @Resource
+    private RedissonClient redissonClient;
 
     /**
      * 向所在房间的用户或服务器的所有用户广播消息
@@ -70,14 +73,11 @@ public class ChatController {
     /**
      * 聊天限流校验
      */
-    @SuppressWarnings("UnstableApiUsage")
     private boolean checkLimit(User curUser) {
-        RateLimiter rateLimiter = rateLimiterMap.get(curUser.getId());
-        if (rateLimiter == null) {
-            rateLimiter = RateLimiter.create(landlordsProperties.getPermitsPerSecondOfChat());
-            rateLimiterMap.put(curUser.getId(), rateLimiter);
-            return true; // DO NOT acquire in first time
-        }
-        return rateLimiter.tryAcquire();
+        String key = RATE_LIMITER_PREFIX + curUser.getId();
+        RRateLimiter limiter = redissonClient.getRateLimiter(key);
+        limiter.trySetRate(RateType.OVERALL, 1,
+                landlordsProperties.getPermitsPerSecondOfChat(), RateIntervalUnit.SECONDS);
+        return limiter.tryAcquire();
     }
 }

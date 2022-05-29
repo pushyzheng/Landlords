@@ -15,3 +15,4 @@ landlords:
   frontend-host: landlords.pushyzheng.com
   jwt-secret: 298b8610-6835-4d12-b8ae-efba3dbcccad
   max-seconds-for-every-round: 30
+  permits-per-second-of-chat: 1

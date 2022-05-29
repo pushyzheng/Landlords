@@ -38,7 +38,7 @@ public class LandlordsProperties {
     /**
      * 聊天发送的最大频率, 默认单位: 秒
      */
-    private Double permitsPerSecondOfChat = 0.5;
+    private Long permitsPerSecondOfChat = 1L;
 
     /**
      * 玩家在超时没有出牌后, 处理的策略
